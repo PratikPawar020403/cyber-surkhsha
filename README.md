@@ -1,4 +1,4 @@
-# CyberSuraksha (NCRP 2.0)
+# CyberSuraksha
 
 > A modern, citizen-first redesign of India's National Cyber Crime Reporting Portal (`cybercrime.gov.in`).  
 > Built for the **"Redesign Indian Sites"** competition.
@@ -18,24 +18,8 @@
 ---
 
 ## 🛠️ Architecture
-
-- **Zero-Dependency Vanilla Web Stack**: Single-file `<180 KB` HTML5, CSS3, and JavaScript architecture with instant 3G load times.
 - **Client-Side Storage Engine**: Resilient `localStorage` wrapper with in-memory fallbacks for offline demo reliability.
 - **Native Web APIs**: Utilizes Web Speech Recognition, Web Speech Synthesis, and HTML5 Drag-and-Drop file handling.
-
----
-
-## 💻 Run Locally
-
-No build steps or package managers required. Simply open `index.html` directly in any modern browser, or run a local server:
-
-```bash
-# Using Python
-python -m http.server 8000
-
-# Or using Node.js
-npx serve .
-```
 
 Visit: `http://localhost:8000`
 
