@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>CyberSuraksha — National Cybercrime Reporting & Victim Assistance Portal</title>
+<link rel="icon" type="image/png" href="cyber.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -277,22 +278,13 @@
   }
   .brand-area:hover { opacity: 0.85; }
 
-  /* Minimalist Matte Navy Emblem Badge */
-  .brand-glossy-badge {
+  /* Clean Brand Emblem */
+  .brand-logo-img {
     width: 28px;
     height: 28px;
-    border-radius: 7px;
-    background: var(--text-main);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #FFFFFF;
+    border-radius: 6px;
+    object-fit: contain;
     flex-shrink: 0;
-  }
-  .brand-glossy-badge svg {
-    width: 16px;
-    height: 16px;
-    stroke: #FFFFFF;
   }
 
   .brand-text {
@@ -1234,16 +1226,9 @@
 <header class="site-header">
   <div class="notch-navbar">
     
-    <!-- Left Brand Entity (Glossy 3D App Badge + Bold Title) -->
+    <!-- Left Brand Entity -->
     <a href="#" class="brand-area" onclick="showScreen('screen-home'); return false;" aria-label="CyberSuraksha Home">
-      <div class="brand-glossy-badge">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 2L3 7v6c0 5.5 3.8 9.5 9 11 5.2-1.5 9-5.5 9-11V7l-9-5z"/>
-          <path d="M12 22V12"/>
-          <path d="M12 12L20.5 7.5"/>
-          <path d="M12 12L3.5 7.5"/>
-        </svg>
-      </div>
+      <img src="cyber.png" alt="CyberSuraksha Logo" class="brand-logo-img" width="28" height="28">
       <span class="brand-text">CyberSuraksha</span>
     </a>
 
