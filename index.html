@@ -1,0 +1,3728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CyberSuraksha — National Cybercrime Reporting & Victim Assistance Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* =========================================================
+     1. SIMPLE, MODERN, CALM DESIGN TOKENS
+  ========================================================== */
+  :root {
+    --bg: #F8FAFC;
+    --card: #FFFFFF;
+    --card-subtle: #F1F5F9;
+    --border: #E2E8F0;
+    --border-hover: #CBD5E1;
+    --border-focus: #0F172A;
+    
+    --text-main: #0F172A;
+    --text-muted: #475569;
+    --text-light: #64748B;
+    
+    --primary: #0F172A;
+    --primary-hover: #1E293B;
+    --primary-light: #F1F5F9;
+    
+    --emergency: #DC2626;
+    --emergency-hover: #B91C1C;
+    --emergency-bg: #FEF2F2;
+    --emergency-border: #FEE2E2;
+    --emergency-text: #991B1B;
+    
+    --success: #16A34A;
+    --success-bg: #F0FDF4;
+    --success-border: #DCFCE7;
+    --success-text: #166534;
+    
+    --warning: #D97706;
+    --warning-bg: #FFFBEB;
+    --warning-border: #FEF3C7;
+    --warning-text: #92400E;
+    
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-full: 9999px;
+    
+    --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+    --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.06);
+    --shadow-lg: 0 10px 24px -3px rgba(15, 23, 42, 0.08);
+    
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-devanagari: 'Noto Sans Devanagari', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+    
+    --fs-scale: 1;
+
+    /* Scoped Tricolor Scrollbar Tokens */
+    --flag-saffron: #FF9933;
+    --flag-green: #138808;
+  }
+
+  /* Devanagari & Hindi Font Polish */
+  :lang(hi), html[lang="hi"] {
+    font-family: var(--font-devanagari), var(--font-sans);
+    line-height: 1.65;
+    letter-spacing: 0em; /* Neutralize negative tracking that clips Devanagari matras */
+  }
+  :lang(hi) h1, :lang(hi) h2, :lang(hi) h3, :lang(hi) h4,
+  html[lang="hi"] h1, html[lang="hi"] h2, html[lang="hi"] h3, html[lang="hi"] h4 {
+    font-family: var(--font-devanagari);
+    line-height: 1.4 !important;
+    letter-spacing: 0em !important; /* Override -0.02em to prevent conjunct clipping */
+  }
+
+  /* High Contrast Accessibility Mode */
+  html.high-contrast {
+    --bg: #FFFFFF;
+    --card: #FFFFFF;
+    --card-subtle: #F4F4F4;
+    --border: #000000;
+    --border-hover: #000000;
+    --border-focus: #000000;
+    --text-main: #000000;
+    --text-muted: #1A1A1A;
+    --text-light: #333333;
+    --primary: #000000;
+    --primary-hover: #1A1A1A;
+    --emergency: #9E0000;
+    --emergency-bg: #FFFFFF;
+    --emergency-border: #000000;
+    --emergency-text: #9E0000;
+    --success: #000000;
+    --shadow-sm: none;
+    --shadow-md: 0 0 0 2px #000;
+    --shadow-lg: 0 0 0 3px #000;
+  }
+  /* High-contrast overrides for hardcoded pastel backgrounds */
+  html.high-contrast .ncrp-slip-table td.label-col { background: #FFFFFF !important; }
+  html.high-contrast .ncrp-slip-qr-box { background: #FFFFFF !important; border-color: #000 !important; }
+  html.high-contrast .jurisdiction-badge { background: #FFFFFF !important; border-color: #000 !important; }
+
+  /* High-contrast scrollbar override — clarity over decoration */
+  html.high-contrast .tiranga-progress-track {
+    background: #E5E5E5 !important;
+  }
+  html.high-contrast .tiranga-progress-fill {
+    background: #000000 !important;
+  }
+
+  /* =========================================================
+     2. BASE & RESET
+  ========================================================== */
+  *, *::before, *::after { box-sizing: border-box; }
+  html {
+    font-size: calc(16px * var(--fs-scale));
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    scrollbar-width: none; /* Hide default native scrollbar in Firefox */
+  }
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none; /* Hide default native scrollbar in Chromium/WebKit */
+  }
+
+  /* =========================================================
+     SLIM MINIMALIST INDIAN FLAG (TIRANGA) PROGRESS SCROLLBAR
+     - Ultra-slim 3px line at right edge
+     - Top (0-33.3% scroll): Orange / Saffron
+     - Middle (33.3-66.6% scroll): Orange + White
+     - Bottom (66.6-100% scroll): Orange + White + Green
+     - Scrolling up: Green disappears, then White disappears
+     - Zero gimmicks, zero floating mover, clean & sober
+  ========================================================== */
+  .tiranga-progress-track {
+    position: fixed;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    z-index: 9999;
+    background: rgba(15, 23, 42, 0.04);
+    pointer-events: none;
+  }
+  .tiranga-progress-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 0%;
+    background: linear-gradient(to bottom,
+      var(--flag-saffron) 0%, var(--flag-saffron) 33.33%,
+      #CBD5E1 33.33%, #FFFFFF 34.5%, #FFFFFF 65.5%, #CBD5E1 66.66%,
+      var(--flag-green) 66.66%, var(--flag-green) 100%) fixed;
+    background-size: 100% 100vh;
+    background-repeat: no-repeat;
+    border-radius: 0 0 2px 2px;
+    transition: height 0.06s ease-out;
+  }
+
+  /* Reset inner scrollable elements (tables, code snippets) to neutral */
+  div::-webkit-scrollbar,
+  section::-webkit-scrollbar,
+  table::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  div::-webkit-scrollbar-track,
+  section::-webkit-scrollbar-track,
+  table::-webkit-scrollbar-track {
+    background: var(--card-subtle);
+    border-radius: 4px;
+    box-shadow: none;
+  }
+  div::-webkit-scrollbar-thumb,
+  section::-webkit-scrollbar-thumb,
+  table::-webkit-scrollbar-thumb {
+    background: var(--border-hover);
+    border: none;
+    border-radius: 4px;
+    box-shadow: none;
+    min-height: 24px;
+  }
+  body {
+    margin: 0;
+    font-family: var(--font-sans);
+    color: var(--text-main);
+    background: var(--bg);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  main { flex: 1 0 auto; }
+  h1, h2, h3, h4 { margin: 0; font-weight: 700; color: var(--text-main); letter-spacing: -0.02em; }
+  p { margin: 0; }
+  a { color: inherit; text-decoration: none; }
+  button { font-family: inherit; }
+  .visually-hidden {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+  .wrap { max-width: 1140px; margin: 0 auto; padding: 0 20px; width: 100%; }
+
+  :focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+
+  /* =========================================================
+     3. CRISP WHITE HANGING NOTCH NAVBAR
+  ========================================================== */
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 110;
+    display: flex;
+    justify-content: center;
+    pointer-events: none; /* Allows clicking content around the hanging notch */
+    width: 100%;
+  }
+
+  /* The Hanging Notch Island Container */
+  .notch-navbar {
+    position: relative;
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    background: rgba(255, 255, 255, 0.96);
+    color: var(--text-main);
+    padding: 6px 14px 7px 16px;
+    border-radius: 0 0 20px 20px;
+    border: 1px solid rgba(15, 23, 42, 0.1);
+    border-top: none;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05), 0 2px 6px rgba(0, 0, 0, 0.03);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    max-width: 1120px;
+    width: auto;
+  }
+
+  /* Inverted Concave Corner Fillets (Smooth hanging attachment to top) */
+  .notch-navbar::before,
+  .notch-navbar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    width: 18px;
+    height: 18px;
+    pointer-events: none;
+  }
+  .notch-navbar::before {
+    left: -18px;
+    background: radial-gradient(circle at 0% 100%, transparent 18px, rgba(255, 255, 255, 0.96) 18px);
+  }
+  .notch-navbar::after {
+    right: -18px;
+    background: radial-gradient(circle at 100% 100%, transparent 18px, rgba(255, 255, 255, 0.96) 18px);
+  }
+
+  /* Brand / Logo Area */
+  .brand-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    flex-shrink: 0;
+    transition: opacity 0.15s ease;
+  }
+  .brand-area:hover { opacity: 0.85; }
+
+  /* Minimalist Matte Navy Emblem Badge */
+  .brand-glossy-badge {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    background: var(--text-main);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FFFFFF;
+    flex-shrink: 0;
+  }
+  .brand-glossy-badge svg {
+    width: 16px;
+    height: 16px;
+    stroke: #FFFFFF;
+  }
+
+  .brand-text {
+    font-family: var(--font-sans);
+    font-weight: 800;
+    font-size: 0.95rem;
+    letter-spacing: -0.01em;
+    color: var(--text-main);
+    white-space: nowrap;
+  }
+
+  /* Center Navigation Links */
+  .header-nav {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+  .nav-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-family: var(--font-sans);
+    font-size: 0.84rem;
+    font-weight: 600;
+    padding: 6px 11px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: color 0.15s ease, background 0.15s ease;
+    white-space: nowrap;
+  }
+  .nav-btn:hover {
+    color: var(--text-main);
+    background: rgba(15, 23, 42, 0.05);
+  }
+  .nav-btn.current {
+    color: var(--text-main);
+    font-weight: 700;
+    background: rgba(15, 23, 42, 0.08);
+  }
+
+  /* Right Action Section */
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  /* Language Segmented Control (Plain Text Only: EN / हिं, Zero Icons) */
+  .lang-segmented-pill {
+    display: inline-flex;
+    align-items: center;
+    background: var(--card-subtle);
+    border: 1px solid var(--border);
+    border-radius: 9999px;
+    padding: 3px;
+    gap: 2px;
+  }
+  .lang-pill-btn {
+    background: none;
+    border: none;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    font-family: var(--font-sans);
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .lang-pill-btn.active {
+    background: var(--card);
+    color: var(--text-main);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  }
+  .lang-pill-btn:hover:not(.active) {
+    color: var(--text-main);
+  }
+
+  /* Crisp Solid Slate Action Pill Button */
+  .notch-white-pill-btn {
+    background: var(--text-main);
+    color: #FFFFFF;
+    border: none;
+    border-radius: 9999px;
+    padding: 6px 14px;
+    font-family: var(--font-sans);
+    font-size: 0.80rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.2);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, color 0.15s ease;
+    white-space: nowrap;
+  }
+  .notch-white-pill-btn:hover {
+    background: var(--emergency);
+    color: #FFFFFF;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(220, 38, 38, 0.3);
+  }
+  .notch-white-pill-btn svg {
+    width: 14px;
+    height: 14px;
+    stroke: #FFFFFF;
+  }
+
+  .mobile-menu-btn {
+    display: none;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 8px;
+    color: var(--text-main);
+    cursor: pointer;
+  }
+  .mobile-menu-btn svg { width: 18px; height: 18px; stroke: var(--text-main); }
+
+  @media (max-width: 1100px) {
+    .site-header { width: 100%; padding: 0 10px; }
+    .notch-navbar {
+      width: 100%;
+      border-radius: 0 0 16px 16px;
+    }
+    .header-nav {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      box-shadow: var(--shadow-lg);
+      flex-direction: column;
+      align-items: stretch;
+      z-index: 130;
+    }
+    .header-nav.open { display: flex; }
+    .header-nav .nav-btn { text-align: left; padding: 10px 14px; font-size: 0.92rem; }
+    .mobile-menu-btn { display: block; }
+    .notch-navbar::before, .notch-navbar::after { display: none; }
+  }
+
+  @media (max-width: 600px) {
+    .lang-segmented-pill { padding: 2px; gap: 2px; }
+    .lang-pill-btn { padding: 3px 7px; font-size: 0.74rem; }
+    .notch-white-pill-btn { padding: 5px 10px; font-size: 0.76rem; }
+    .notch-white-pill-btn span { display: inline; }
+  }
+
+  /* =========================================================
+     3B. RESPONSIVE ADAPTATIONS
+     Keeps the existing desktop presentation intact while giving
+     compact screens enough room for the reporting workflow.
+  ========================================================== */
+  .mobile-nav-tools { display: none; }
+  .incident-meta-grid,
+  .location-select-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .location-select-grid { gap: 10px; margin-top: 8px; }
+  .confirmation-wrap { padding: 40px 20px 70px; max-width: 640px; margin: 0 auto; text-align: center; }
+
+  @media (max-width: 600px) {
+    .site-header { padding: 0 8px; }
+    .notch-navbar { gap: 6px; padding: 6px 10px 7px; }
+    .brand-area { gap: 7px; min-width: 0; }
+    .brand-glossy-badge { width: 26px; height: 26px; }
+    .brand-text { font-size: 0.86rem; }
+    .header-actions { gap: 6px; }
+    .a11y-controls,
+    .notch-white-pill-btn { display: none; }
+    .mobile-menu-btn { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; padding: 6px; }
+    .header-nav { top: calc(100% + 4px); padding: 10px; }
+    .header-nav .nav-btn { min-height: 44px; }
+    .mobile-nav-tools {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      padding-top: 10px;
+      margin-top: 4px;
+      border-top: 1px solid var(--border);
+    }
+    .mobile-nav-tools .lang-pill-btn {
+      min-height: 40px;
+      border: 1px solid var(--border);
+      background: var(--card-subtle);
+      font-size: 0.82rem;
+    }
+    .wrap { padding-left: 14px; padding-right: 14px; }
+    .hero-section { padding-top: 32px; }
+    .hero-title { font-size: clamp(1.85rem, 9vw, 2.25rem); }
+    .hero-desc { font-size: 1rem; }
+    .emergency-callout { padding: 14px; gap: 12px; }
+    .ec-text { min-width: 0; }
+    .call-1930-btn { width: 100%; justify-content: center; min-height: 44px; }
+    .ai-intake-card { padding: 16px; }
+    .ai-input-actions { align-items: stretch; }
+    .ai-action-btn { flex: 1 1 100%; justify-content: center; min-height: 44px; }
+    .ai-recording-bar { align-items: flex-start; flex-wrap: wrap; }
+    .stop-rec-btn { min-height: 36px; }
+    .entity-chip,
+    .f-chip,
+    .ncrp-slip-table td,
+    .review-block-content,
+    .jurisdiction-badge,
+    .rbi-letter-sheet { overflow-wrap: anywhere; word-break: break-word; }
+    .trust-bar { padding: 16px; gap: 14px; }
+    .trust-item { width: 100%; }
+    .flow-container { padding-top: 28px; padding-bottom: 56px; }
+    .stepper-row { margin-bottom: 22px; }
+    .step-text { font-size: 0.68rem; }
+    .form-card { padding: 20px 14px; }
+    .incident-meta-grid,
+    .location-select-grid { grid-template-columns: 1fr; }
+    .btn-row { flex-direction: column; align-items: stretch; }
+    .btn-row > span { display: none; }
+    .btn-row .btn { width: 100%; min-height: 44px; justify-content: center; }
+    .otp-grid { width: 100%; gap: 4px; justify-content: space-between; }
+    .otp-box { width: min(14.5vw, 44px); min-width: 0; height: 48px; }
+    .clean-dropzone { padding: 18px 14px; min-height: 96px; display: flex; flex-direction: column; justify-content: center; }
+    .suspect-add-chip,
+    .demo-chip,
+    .preset-chip,
+    .lc-filter-btn { min-height: 36px; }
+    .ncrp-slip-card { padding: 16px; }
+    .ncrp-slip-header,
+    .ncrp-slip-qr-box { flex-direction: column; align-items: flex-start; }
+    .ncrp-slip-header > div:last-child { text-align: left !important; }
+    .ncrp-slip-table { table-layout: fixed; font-size: 0.78rem; }
+    .ncrp-slip-table td { padding: 7px 8px; vertical-align: top; }
+    .ncrp-slip-table td.label-col { width: 38%; }
+    .rbi-card,
+    .rbi-letter-sheet,
+    .audit-box,
+    .lc-card,
+    .diag-item-card,
+    .diag-result-panel { padding: 18px; }
+    .confirmation-wrap { padding: 32px 14px 56px; }
+    .site-footer { margin-top: 40px; padding: 28px 0 20px; }
+    .footer-inner { align-items: flex-start; }
+    .mobile-bar { gap: 10px; padding: 8px 12px calc(8px + env(safe-area-inset-bottom)); }
+    .mobile-bar strong { font-size: 0.82rem; }
+    .mobile-bar span { font-size: 0.70rem !important; }
+    .mobile-bar .call-1930-btn { width: auto; min-height: 40px; padding: 8px 12px; }
+    body { padding-bottom: calc(64px + env(safe-area-inset-bottom)); }
+    .voice-fab { right: 14px; bottom: calc(78px + env(safe-area-inset-bottom)); max-width: calc(100vw - 28px); }
+  }
+
+  @media (max-width: 360px) {
+    .brand-text { font-size: 0.80rem; }
+    .lang-pill-btn { padding: 3px 6px; }
+    .mobile-nav-tools { grid-template-columns: 1fr; }
+    .hero-badge { font-size: 0.74rem; }
+    .step-text { font-size: 0.62rem; }
+    .step-circle { width: 29px; height: 29px; }
+    .stepper-line,
+    .stepper-line-fill { top: 14px; }
+    .mobile-bar { padding-left: 10px; padding-right: 10px; }
+    .mobile-bar > div { min-width: 0; }
+  }
+
+  /* =========================================================
+     4. SCREENS & PAGE CONTAINERS
+  ========================================================== */
+  .screen { display: none; }
+  .screen.active { display: block; animation: fadeIn 0.2s ease-out; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* =========================================================
+     5. HERO SECTION & SITUATION CARDS
+  ========================================================== */
+  .hero-section {
+    padding: 44px 0 20px;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 600;
+    color: var(--text-muted); background: var(--card); border: 1px solid var(--border);
+    padding: 4px 10px; border-radius: var(--radius-full); margin-bottom: 16px;
+  }
+  .hero-badge .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--success); }
+  
+  .hero-title {
+    font-size: clamp(2rem, 3.8vw, 2.75rem); line-height: 1.18; max-width: 24ch; color: var(--text-main);
+  }
+  .hero-desc {
+    margin-top: 14px; font-size: 1.08rem; color: var(--text-muted); max-width: 60ch; line-height: 1.6;
+  }
+
+  /* Clean Emergency Banner */
+  .emergency-callout {
+    margin-top: 24px; background: var(--emergency-bg); border: 1px solid var(--emergency-border);
+    border-left: 4px solid var(--emergency); border-radius: var(--radius-md); padding: 16px 20px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  }
+  .ec-text { flex: 1; min-width: 240px; }
+  .ec-text strong { display: block; color: var(--emergency-text); font-size: 0.98rem; margin-bottom: 2px; font-weight: 700; }
+  .ec-text p { color: var(--emergency-text); font-size: 0.88rem; opacity: 0.92; line-height: 1.45; }
+
+  /* Simple, Sober & Clear Emergency Call Button */
+  .call-1930-btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: #0F172A; color: #FFFFFF !important; text-decoration: none;
+    padding: 9px 16px; border-radius: var(--radius-sm);
+    font-size: 0.88rem; font-weight: 700;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: background 0.15s ease, border-color 0.15s ease;
+    cursor: pointer; border: 1px solid #0F172A;
+    flex-shrink: 0;
+  }
+  .call-1930-btn:hover {
+    background: #1E293B; border-color: #1E293B; color: #FFFFFF !important;
+  }
+  .call-1930-btn svg {
+    width: 15px; height: 15px; stroke: #FFFFFF; flex-shrink: 0;
+  }
+
+  /* Competition Demo Toolbar (Dev/Judging Out-of-Band Utility) */
+  .demo-shortcuts {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 32px;
+    padding: 10px 14px; background: var(--card-subtle); border: 1px dashed var(--border); border-radius: var(--radius-md);
+  }
+  .demo-label { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); letter-spacing: 0.01em; }
+  .demo-chip {
+    background: var(--card); border: 1px solid var(--border); color: var(--text-main);
+    padding: 4px 10px; border-radius: var(--radius-sm); font-size: 0.78rem; font-weight: 600;
+    cursor: pointer; transition: all 0.15s ease; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .demo-chip svg {
+    width: 13px; height: 13px; stroke: currentColor; flex-shrink: 0;
+  }
+  .demo-chip:hover { background: var(--text-main); color: #fff; border-color: var(--text-main); }
+  .demo-chip:hover svg { stroke: #fff; }
+
+  /* =========================================================
+     5B. AI SMART VOICE & TEXT COMPLAINT INTAKE ASSISTANT
+  ========================================================== */
+  .ai-intake-card {
+    margin-top: 24px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+    position: relative;
+  }
+  .ai-intake-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .ai-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #EFF6FF;
+    border: 1px solid #BFDBFE;
+    color: #1E40AF;
+    font-size: 0.82rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: var(--radius-full);
+  }
+  .ai-sparkle { color: #2563EB; font-size: 1rem; }
+  .ai-kicker-tag {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+  .ai-input-wrap {
+    position: relative;
+  }
+  .ai-intake-textarea {
+    width: 100%;
+    box-sizing: border-box;
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    padding: 14px 16px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--card-subtle);
+    color: var(--text-main);
+    resize: vertical;
+    min-height: 84px;
+    transition: all 0.15s ease;
+  }
+  .ai-intake-textarea:focus {
+    outline: none;
+    border-color: var(--text-main);
+    background: var(--card);
+    box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.08);
+  }
+  .ai-input-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+  .ai-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 0.86rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    border: 1px solid transparent;
+  }
+  .ai-action-btn.voice-btn {
+    background: var(--card-subtle);
+    border-color: var(--border);
+    color: var(--text-main);
+  }
+  .ai-action-btn.voice-btn:hover {
+    background: var(--card);
+    border-color: var(--text-main);
+  }
+  .ai-action-btn.voice-btn.recording {
+    background: #FEE2E2;
+    border-color: #F87171;
+    color: #DC2626;
+    animation: micPulse 1.5s infinite;
+  }
+  @keyframes micPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); }
+    50% { box-shadow: 0 0 0 6px rgba(220, 38, 38, 0); }
+  }
+  .ai-action-btn.analyze-btn {
+    background: #0F172A;
+    color: #FFFFFF;
+    border-color: #0F172A;
+  }
+  .ai-action-btn.analyze-btn:hover {
+    background: #1E293B;
+  }
+
+  /* Live Recording Bar */
+  .ai-recording-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 10px;
+    padding: 10px 14px;
+    background: #FEF2F2;
+    border: 1px solid #FECACA;
+    border-radius: var(--radius-sm);
+  }
+  .recording-pulse {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #DC2626;
+    animation: blink 1s infinite alternate;
+  }
+  @keyframes blink { from { opacity: 0.3; } to { opacity: 1; } }
+  .stop-rec-btn {
+    background: #DC2626;
+    color: #FFFFFF;
+    border: none;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  /* AI Extraction Result Card */
+  .ai-extraction-card {
+    margin-top: 14px;
+    background: #F8FAFC;
+    border: 1px solid #CBD5E1;
+    border-left: 4px solid var(--primary);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    animation: fadeIn 0.2s ease-out;
+  }
+  .ai-ext-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .ai-ext-cat strong {
+    display: block;
+    font-size: 0.94rem;
+    color: var(--text-main);
+  }
+  .urgency-badge {
+    display: inline-block;
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: #B45309;
+    background: #FEF3C7;
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    margin-top: 3px;
+  }
+  .ai-ext-entities {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .entity-chip {
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    color: #334155;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* Judge Demo Presets */
+  .ai-demo-presets {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .preset-label {
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .preset-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .preset-chip {
+    background: var(--card-subtle);
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    padding: 4px 9px;
+    border-radius: 4px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .preset-chip:hover {
+    background: var(--text-main);
+    color: #FFFFFF;
+    border-color: var(--text-main);
+  }
+
+  /* Situation Cards Grid */
+  .section-title-area { margin: 40px 0 20px; }
+  .section-kicker { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+  .section-heading { font-size: 1.5rem; margin-top: 4px; }
+  .section-sub { font-size: 0.95rem; color: var(--text-muted); margin-top: 4px; }
+
+  .situation-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+  }
+  @media (max-width: 980px) { .situation-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 520px) { .situation-grid { grid-template-columns: 1fr; } }
+
+  .sit-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-md);
+    padding: 22px 18px; text-align: left; cursor: pointer; display: flex; flex-direction: column;
+    justify-content: space-between; min-height: 200px; box-shadow: var(--shadow-sm);
+    transition: all 0.15s ease;
+  }
+  .sit-card:hover {
+    border-color: var(--text-main); box-shadow: var(--shadow-md); transform: translateY(-2px);
+  }
+  .sit-icon-wrap {
+    width: 40px; height: 40px; border-radius: var(--radius-sm); background: var(--card-subtle);
+    border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; margin-bottom: 14px;
+  }
+  .sit-icon-wrap svg { width: 20px; height: 20px; stroke: var(--text-main); }
+  .sit-card h3 { font-size: 1.05rem; margin-bottom: 6px; }
+  .sit-card p { font-size: 0.88rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 14px; }
+  .sit-tag {
+    font-size: 0.76rem; font-weight: 600; color: var(--text-muted); background: var(--card-subtle);
+    padding: 3px 8px; border-radius: 4px; align-self: flex-start;
+  }
+
+  /* Trust Bar */
+  .trust-bar {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    margin-top: 32px; padding: 18px 24px; background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+  }
+  .trust-item { display: flex; align-items: center; gap: 8px; font-size: 0.88rem; font-weight: 600; color: var(--text-muted); }
+  .trust-item svg { width: 18px; height: 18px; stroke: var(--text-main); flex: none; }
+
+  /* =========================================================
+     6. STREAMLINED REPORTING WIZARD
+  ========================================================== */
+  .flow-container { padding: 36px 0 70px; max-width: 680px; margin: 0 auto; }
+  
+  .back-link {
+    display: inline-flex; align-items: center; gap: 6px; background: none; border: none;
+    color: var(--text-muted); font-size: 0.88rem; font-weight: 600; cursor: pointer; padding: 0; margin-bottom: 16px;
+  }
+  .back-link:hover { color: var(--text-main); }
+  .back-link svg { width: 16px; height: 16px; stroke: currentColor; }
+
+  /* Clean Stepper */
+  .stepper-row {
+    display: flex; align-items: center; justify-content: space-between; position: relative; margin-bottom: 28px;
+  }
+  .stepper-line {
+    position: absolute; top: 16px; left: 20px; right: 20px; height: 2px; background: var(--border); z-index: 0;
+  }
+  .stepper-line-fill {
+    position: absolute; top: 16px; left: 20px; height: 2px; background: var(--text-main); z-index: 1;
+    width: 0%; transition: width 0.25s ease;
+  }
+  .step-node {
+    position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 6px;
+  }
+  .step-circle {
+    width: 32px; height: 32px; border-radius: 50%; background: var(--card); border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center; font-size: 0.82rem; font-weight: 700;
+    color: var(--text-muted); font-family: var(--font-mono); transition: all 0.2s ease;
+  }
+  .step-node.active .step-circle {
+    background: var(--text-main); border-color: var(--text-main); color: #fff;
+  }
+  .step-node.completed .step-circle {
+    background: var(--success); border-color: var(--success); color: #fff;
+  }
+  .step-text { font-size: 0.78rem; font-weight: 600; color: var(--text-muted); }
+  .step-node.active .step-text { color: var(--text-main); font-weight: 700; }
+
+  .form-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    padding: 32px; box-shadow: var(--shadow-sm);
+  }
+  @media (max-width: 560px) { .form-card { padding: 22px 18px; } }
+
+  .step-panel { display: none; }
+  .step-panel.active { display: block; }
+
+  /* Input Fields */
+  .input-group { margin-bottom: 22px; }
+  .input-group label {
+    display: block; font-size: 0.92rem; font-weight: 700; color: var(--text-main); margin-bottom: 6px;
+  }
+  .input-group .field-hint { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 8px; line-height: 1.4; }
+  
+  .clean-input {
+    width: 100%; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 11px 14px;
+    font-size: 0.95rem; font-family: inherit; color: var(--text-main); background: var(--card);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .clean-input:focus {
+    border-color: var(--primary); box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.08); outline: none;
+  }
+  textarea.clean-input { min-height: 110px; resize: vertical; line-height: 1.5; }
+
+  /* Buttons */
+  .btn-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 24px; }
+  .btn {
+    border: none; border-radius: var(--radius-sm); padding: 11px 22px; font-size: 0.92rem; font-weight: 700;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s ease;
+  }
+  .btn-primary { background: var(--text-main); color: #fff; }
+  .btn-primary:hover { background: var(--primary-hover); }
+  .btn-secondary { background: var(--card-subtle); color: var(--text-main); border: 1px solid var(--border); }
+  .btn-secondary:hover { background: var(--border); }
+  .btn-block { width: 100%; justify-content: center; }
+
+  /* 6-Box OTP Input */
+  .otp-grid { display: flex; gap: 8px; margin: 12px 0 16px; }
+  .otp-box {
+    width: 44px; height: 52px; text-align: center; font-size: 1.25rem; font-weight: 700;
+    border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: var(--font-mono);
+    color: var(--text-main); background: var(--card); outline: none; transition: all 0.15s ease;
+  }
+  .otp-box:focus { border-color: var(--text-main); box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.08); }
+  .otp-box.filled { background: var(--card-subtle); border-color: var(--border-hover); }
+
+  /* Dropzone */
+  .clean-dropzone {
+    border: 2px dashed var(--border); border-radius: var(--radius-sm); padding: 22px; text-align: center;
+    cursor: pointer; background: var(--card-subtle); color: var(--text-muted); font-size: 0.88rem;
+    transition: all 0.15s ease;
+  }
+  .clean-dropzone:hover { border-color: var(--text-main); background: var(--card); }
+  .file-chips-wrap { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .f-chip {
+    background: var(--card); border: 1px solid var(--border); border-radius: 4px; padding: 4px 10px;
+    font-size: 0.8rem; display: inline-flex; align-items: center; gap: 6px; font-weight: 600;
+  }
+  .f-chip button { background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 0.95rem; }
+
+  /* =========================================================
+     7. LOCATION DETECTION, REVIEW SHEET & OFFICIAL SLIP
+  ========================================================== */
+  /* Location & Jurisdiction Styles */
+  .location-box {
+    background: var(--card-subtle); border: 1px solid var(--border); border-radius: var(--radius-md);
+    padding: 16px; margin-top: 14px;
+  }
+  .loc-detect-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
+  .loc-detect-btn {
+    background: var(--card); border: 1px solid var(--border); color: var(--text-main);
+    padding: 8px 14px; border-radius: var(--radius-sm); font-size: 0.84rem; font-weight: 700;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s ease;
+  }
+  .loc-detect-btn:hover { border-color: var(--text-main); background: var(--text-main); color: #fff; }
+  .jurisdiction-badge {
+    background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: var(--radius-sm);
+    padding: 12px 14px; margin-top: 10px; font-size: 0.86rem; color: #1E3A8A;
+    display: flex; align-items: flex-start; gap: 8px; line-height: 1.45;
+  }
+
+  /* Suspect Metadata Expandable Chips */
+  .suspect-chips-bar { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0 14px; }
+  .suspect-add-chip {
+    background: var(--card); border: 1px dashed var(--border); color: var(--text-muted);
+    font-size: 0.8rem; font-weight: 600; padding: 5px 11px; border-radius: var(--radius-sm);
+    cursor: pointer; transition: all 0.15s ease;
+  }
+  .suspect-add-chip:hover { border-color: var(--text-main); color: var(--text-main); background: var(--card-subtle); }
+  .suspect-input-fields {
+    background: var(--card-subtle); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 14px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 10px;
+  }
+
+  /* Pre-Submission Final Review Styles */
+  .review-container {
+    background: var(--card-subtle); border: 1px solid var(--border); border-radius: var(--radius-md);
+    padding: 18px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 12px;
+  }
+  .review-block {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 14px 16px;
+  }
+  .review-block-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .review-block-title { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
+  .review-edit-btn {
+    background: none; border: none; color: var(--text-main); font-size: 0.78rem; font-weight: 700;
+    cursor: pointer; text-decoration: underline; padding: 0;
+  }
+  .review-block-content { font-size: 0.88rem; color: var(--text-main); line-height: 1.45; }
+  .declaration-box {
+    background: #FFFBEB; border: 1px solid #FDE68A; border-radius: var(--radius-sm);
+    padding: 12px 14px; font-size: 0.84rem; color: #92400E; display: flex; align-items: flex-start;
+    gap: 8px; margin-bottom: 16px; line-height: 1.4;
+  }
+
+  /* Official NCRP Acknowledgment Slip (Print Ready) */
+  .ncrp-slip-card {
+    background: #FFFFFF; border: 1px solid #D1D5DB; border-radius: var(--radius-md);
+    padding: 24px; text-align: left; margin: 24px 0; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    font-family: var(--font-sans); color: #0F172A;
+  }
+  .ncrp-slip-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    border-bottom: 2px solid #0F172A; padding-bottom: 12px; margin-bottom: 16px;
+  }
+  .ncrp-slip-table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.85rem; }
+  .ncrp-slip-table td { padding: 7px 10px; border: 1px solid #E5E7EB; }
+  .ncrp-slip-table td.label-col { background: #F9FAFB; font-weight: 700; width: 32%; color: #374151; }
+  .ncrp-slip-qr-box {
+    display: flex; align-items: center; gap: 14px; background: #F8FAFC; border: 1px solid #E2E8F0;
+    border-radius: var(--radius-sm); padding: 10px 14px; margin-top: 14px;
+  }
+  @media print {
+    body * { visibility: hidden; }
+    /* Support printing both Confirmation Slip and RBI Dispute Letter */
+    #screen-confirmation, #screen-confirmation *,
+    #screen-rbi.active, #screen-rbi.active * { visibility: visible; }
+    #screen-confirmation { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; }
+    #screen-rbi.active { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; }
+    .btn, .site-header, .site-footer, .voice-fab, .mobile-bar, .demo-shortcuts, .back-link, .tiranga-progress-track { display: none !important; }
+  }
+
+  /* =========================================================
+     8. SCAM DIAGNOSTIC & RBI LETTER SCREENS
+  ========================================================== */
+  .tool-wrap { padding: 40px 0 80px; }
+  .diag-grid-layout {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 24px;
+  }
+  .diag-item-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-md);
+    padding: 22px; cursor: pointer; transition: all 0.15s ease; text-align: left;
+  }
+  .diag-item-card:hover { border-color: var(--text-main); box-shadow: var(--shadow-sm); transform: translateY(-2px); }
+  .diag-item-card h3 { font-size: 1.1rem; margin-bottom: 6px; }
+  .diag-item-card p { font-size: 0.88rem; color: var(--text-muted); line-height: 1.45; }
+
+  .diag-result-panel {
+    background: var(--card); border: 1px solid var(--border); border-left: 4px solid var(--text-main);
+    border-radius: var(--radius-md); padding: 28px; margin-top: 28px; box-shadow: var(--shadow-md); display: none;
+  }
+  .diag-result-panel.show { display: block; }
+  .diag-steps-ol { margin: 14px 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; font-size: 0.92rem; }
+
+  /* RBI Letter Generator Layout */
+  .rbi-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 28px; margin-top: 24px; align-items: start; }
+  @media (max-width: 880px) { .rbi-grid { grid-template-columns: 1fr; } }
+  
+  .rbi-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 26px;
+  }
+  .rbi-letter-sheet {
+    background: #FFFEFA; border: 1px solid #E6DEC8; border-radius: var(--radius-md); padding: 28px;
+    font-family: 'Times New Roman', Georgia, serif; color: #1E232A; font-size: 0.92rem; line-height: 1.6;
+    white-space: pre-wrap;
+  }
+
+  /* =========================================================
+     8. LEARNING CORNER & CYBER HYGIENE STYLES
+  ========================================================== */
+  .lc-filters-bar {
+    display: flex; gap: 8px; flex-wrap: wrap; margin: 20px 0 28px;
+  }
+  .lc-filter-btn {
+    background: var(--card); border: 1px solid var(--border); color: var(--text-muted);
+    padding: 7px 15px; border-radius: var(--radius-full); font-size: 0.82rem; font-weight: 600;
+    cursor: pointer; transition: all 0.15s ease;
+  }
+  .lc-filter-btn:hover { border-color: var(--text-main); color: var(--text-main); }
+  .lc-filter-btn.active { background: var(--text-main); color: #fff; border-color: var(--text-main); }
+
+  .lc-guides-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px;
+  }
+  .lc-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-md);
+    padding: 24px; display: flex; flex-direction: column; justify-content: space-between;
+    transition: all 0.15s ease;
+  }
+  .lc-card:hover { border-color: var(--text-main); box-shadow: var(--shadow-sm); transform: translateY(-2px); }
+  .lc-card-tag {
+    font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+    padding: 3px 8px; border-radius: 4px; background: var(--card-subtle); color: var(--text-muted);
+    display: inline-block; margin-bottom: 12px; align-self: flex-start;
+  }
+  .lc-card h3 { font-size: 1.12rem; margin-bottom: 8px; line-height: 1.3; }
+  .lc-card p { font-size: 0.88rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 14px; }
+  .lc-card-list {
+    margin: 0 0 18px; padding-left: 18px; font-size: 0.85rem; color: var(--text-main);
+    display: flex; flex-direction: column; gap: 6px; line-height: 1.45;
+  }
+  .lc-card-action {
+    display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border);
+    padding-top: 14px; margin-top: auto; font-size: 0.84rem; font-weight: 700; color: var(--text-main);
+  }
+
+  /* Interactive Cyber Resilience Audit Box */
+  .audit-box {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    padding: 28px; margin-bottom: 36px; box-shadow: var(--shadow-sm);
+  }
+  .audit-header {
+    display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;
+    margin-bottom: 18px; padding-bottom: 16px; border-bottom: 1px solid var(--border);
+  }
+  .audit-score-pill {
+    background: var(--card-subtle); border: 1px solid var(--border); border-radius: var(--radius-full);
+    padding: 6px 16px; font-weight: 700; font-size: 0.88rem; font-family: var(--font-mono);
+  }
+  .audit-item {
+    display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border);
+  }
+  .audit-item:last-child { border-bottom: none; }
+  .audit-item input[type="checkbox"] {
+    width: 18px; height: 18px; margin-top: 2px; accent-color: var(--text-main); cursor: pointer; flex-shrink: 0;
+  }
+  .audit-item label { font-size: 0.90rem; font-weight: 600; cursor: pointer; color: var(--text-main); line-height: 1.4; }
+  .audit-item p { font-size: 0.80rem; color: var(--text-muted); margin-top: 2px; }
+
+  /* =========================================================
+     9. SIMPLE CLEAN FOOTER & VOICE ASSISTANT
+  ========================================================== */
+  .site-footer {
+    background: var(--card); border-top: 1px solid var(--border); padding: 40px 0 24px; margin-top: 60px;
+    font-size: 0.88rem; color: var(--text-muted);
+  }
+  .footer-inner { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
+  
+  .voice-fab {
+    position: fixed; right: 20px; bottom: 20px; z-index: 90;
+    background: var(--card); border: 1px solid var(--border); color: var(--text-main);
+    padding: 10px 18px; border-radius: var(--radius-full); font-size: 0.86rem; font-weight: 700;
+    cursor: pointer; box-shadow: var(--shadow-md); display: flex; align-items: center; gap: 8px;
+    transition: all 0.15s ease;
+  }
+  .voice-fab:hover { border-color: var(--text-main); }
+  .voice-fab.speaking { background: var(--text-main); color: #fff; border-color: var(--text-main); }
+
+  /* Mobile Emergency Bar */
+  .mobile-bar {
+    display: none; position: fixed; left: 0; right: 0; bottom: 0; z-index: 80;
+    background: var(--card); border-top: 1px solid var(--border); padding: 10px 16px;
+    align-items: center; justify-content: space-between;
+  }
+  @media (max-width: 768px) {
+    .mobile-bar { display: flex; }
+    body { padding-bottom: 60px; }
+    .voice-fab { bottom: 74px; } /* Elevate above sticky mobile emergency bar */
+  }
+</style>
+</head>
+<body>
+
+<div id="a11y-announcer" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
+
+<!-- Slim Minimalist Indian Flag (Tiranga) Scroll Progress -->
+<div class="tiranga-progress-track" id="tiranga-progress-track" aria-hidden="true">
+  <div class="tiranga-progress-fill" id="tiranga-progress-fill"></div>
+</div>
+
+<!-- Top Notch Hanging Island Navbar (Inspired by Reference) -->
+<header class="site-header">
+  <div class="notch-navbar">
+    
+    <!-- Left Brand Entity (Glossy 3D App Badge + Bold Title) -->
+    <a href="#" class="brand-area" onclick="showScreen('screen-home'); return false;" aria-label="CyberSuraksha Home">
+      <div class="brand-glossy-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L3 7v6c0 5.5 3.8 9.5 9 11 5.2-1.5 9-5.5 9-11V7l-9-5z"/>
+          <path d="M12 22V12"/>
+          <path d="M12 12L20.5 7.5"/>
+          <path d="M12 12L3.5 7.5"/>
+        </svg>
+      </div>
+      <span class="brand-text">CyberSuraksha</span>
+    </a>
+
+    <!-- Central Nav Links -->
+    <nav class="header-nav" id="main-nav" aria-label="Main Navigation">
+      <button type="button" class="nav-btn current" onclick="showScreen('screen-home')" data-en="Home" data-hi="होम">Home</button>
+      <button type="button" class="nav-btn" onclick="showScreen('screen-diagnostic')" data-en="Check a Scam" data-hi="स्कैम जांचें">Check a Scam</button>
+      <button type="button" class="nav-btn" onclick="showScreen('screen-learning')" data-en="Safety Tips" data-hi="सुरक्षा टिप्स">Safety Tips</button>
+      <button type="button" class="nav-btn" onclick="showScreen('screen-suspect')" data-en="Check Suspect" data-hi="संदिग्ध जांचें">Check Suspect</button>
+      <button type="button" class="nav-btn" onclick="showScreen('screen-track')" data-en="Track" data-hi="ट्रैक">Track</button>
+      <div class="mobile-nav-tools" aria-label="Accessibility controls">
+        <button type="button" class="lang-pill-btn" onclick="toggleContrast()" aria-label="Toggle High Contrast Mode">🌓</button>
+        <button type="button" class="lang-pill-btn" onclick="adjustFontScale(-0.1)" aria-label="Decrease Text Size">A-</button>
+        <button type="button" class="lang-pill-btn" onclick="adjustFontScale(0.1)" aria-label="Increase Text Size">A+</button>
+      </div>
+    </nav>
+
+    <!-- Right Actions (Accessibility Controls + Language Segmented Pill + Call 1930 CTA) -->
+    <div class="header-actions">
+      <!-- Quick Accessibility Bar (High Contrast + Font Scaling) -->
+      <div class="lang-segmented-pill a11y-controls" role="group" aria-label="Accessibility controls">
+        <button type="button" class="lang-pill-btn" onclick="toggleContrast()" title="Toggle High Contrast Mode" aria-label="Toggle High Contrast Mode">🌓</button>
+        <button type="button" class="lang-pill-btn" onclick="adjustFontScale(-0.1)" title="Decrease Text Size" aria-label="Decrease Text Size">A-</button>
+        <button type="button" class="lang-pill-btn" onclick="adjustFontScale(0.1)" title="Increase Text Size" aria-label="Increase Text Size">A+</button>
+      </div>
+
+      <div class="lang-segmented-pill" role="group" aria-label="Language selector">
+        <button type="button" id="lang-en" class="lang-pill-btn active" onclick="setLang('en')">EN</button>
+        <button type="button" id="lang-hi" class="lang-pill-btn" onclick="setLang('hi')">हिं</button>
+      </div>
+
+      <!-- White Pill Action Button (Matches Reference) -->
+      <a href="tel:1930" class="notch-white-pill-btn" aria-label="Call 1930 Cyber Helpline">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.4 2.1L8.1 9.7a16 16 0 0 0 6.2 6.2l1.2-1.2a2 2 0 0 1 2.1-.4c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2z"/></svg>
+        <span data-en="Call 1930" data-hi="कॉल 1930">Call 1930</span>
+      </a>
+
+      <button class="mobile-menu-btn" onclick="toggleMenu()" aria-label="Toggle navigation menu" aria-controls="main-nav" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ==================== 1. HOME SCREEN ==================== -->
+  <section class="screen active" id="screen-home">
+    <div class="wrap">
+      
+      <!-- Hero -->
+      <div class="hero-section">
+        <div class="hero-badge">
+          <span class="dot"></span>
+          <span data-en="Available 24×7 Across India" data-hi="भारत भर में 24×7 उपलब्ध">Available 24×7 Across India</span>
+        </div>
+        <h1 class="hero-title" data-en="Report cybercrime simply, and get immediate help." data-hi="साइबर अपराध की रिपोर्ट आसानी से करें, और तुरंत मदद पाएं।">Report cybercrime simply, and get immediate help.</h1>
+        <p class="hero-desc" data-en="Tell us what happened, and we'll guide you — fast. If you've lost money, every minute matters. We'll help you report it and know exactly what to do next." data-hi="बताइए क्या हुआ, हम आपकी मदद करेंगे — तेज़ी से। अगर पैसा गया है, तो हर मिनट अहम है। हम रिपोर्ट करने और अगला कदम उठाने में आपकी मदद करेंगे।">Tell us what happened, and we'll guide you — fast. If you've lost money, every minute matters. We'll help you report it and know exactly what to do next.</p>
+
+        <!-- Emergency Callout (Sober, Secondary Supportive Action) -->
+        <div class="emergency-callout">
+          <div class="ec-text">
+            <strong data-en="Lost money recently?" data-hi="हाल ही में पैसा गंवाया है?">Lost money recently?</strong>
+            <p data-en="Call 1930 now — acting fast gives banks the best chance to freeze the transfer." data-hi="अभी 1930 पर कॉल करें — तुरंत कदम उठाने से बैंकों को ट्रांसफर रोकने का सबसे अच्छा मौका मिलता है।">Call 1930 now — acting fast gives banks the best chance to freeze the transfer.</p>
+          </div>
+          <a href="tel:1930" class="call-1930-btn" aria-label="Call 1930 Cyber Helpline">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.4 2.1L8.1 9.7a16 16 0 0 0 6.2 6.2l1.2-1.2a2 2 0 0 1 2.1-.4c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2z"/></svg>
+            <span data-en="Call 1930 Helpline" data-hi="1930 हेल्पलाइन पर कॉल करें">Call 1930 Helpline</span>
+          </a>
+        </div>
+
+        <!-- AI Smart Complaint Intake Assistant (Voice & Text) -->
+        <div class="ai-intake-card">
+          <div class="ai-intake-header">
+            <div class="ai-badge">
+              <span class="ai-sparkle">✦</span>
+              <span data-en="AI Instant Complaint Assistant" data-hi="AI त्वरित शिकायत सहायक">AI Instant Complaint Assistant</span>
+            </div>
+            <span class="ai-kicker-tag" data-en="Speak or Type in Plain Words" data-hi="अपनी भाषा में बोलें या लिखें">Speak or Type in Plain Words</span>
+          </div>
+          
+          <div class="ai-input-wrap">
+            <textarea id="ai-intake-text" class="ai-intake-textarea" rows="3" 
+              placeholder="Describe what happened or click Speak to talk (e.g. 'I got a call from +91 9876543210 claiming electricity bill unpaid, and ₹48,500 was debited to pay-fraud@okhdfcbank')..." 
+              oninput="onAiIntakeInput()"></textarea>
+            
+            <div class="ai-input-actions">
+              <button type="button" id="ai-voice-btn" class="ai-action-btn voice-btn" onclick="toggleVoiceIntake()" title="Click to speak your complaint">
+                <svg id="mic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                <span id="voice-btn-text" data-en="Speak Complaint" data-hi="बोलकर बताएं">Speak Complaint</span>
+              </button>
+              
+              <button type="button" class="ai-action-btn analyze-btn" onclick="analyzeAndRouteIntake()">
+                <span data-en="Auto-Categorize & Start Report →" data-hi="वर्गीकृत करें और शुरू करें →">Auto-Categorize & Start Report →</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Live Recording Feedback Bar -->
+          <div id="ai-recording-bar" class="ai-recording-bar" style="display:none;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <div class="recording-pulse"></div>
+              <span id="recording-status-text" style="font-size:0.82rem; font-weight:600; color:#DC2626;">Listening... Speak clearly in Hindi or English</span>
+            </div>
+            <button type="button" class="stop-rec-btn" onclick="stopVoiceIntake()">Stop Recording</button>
+          </div>
+
+          <!-- Real-Time AI Detection & Entity Extraction Card -->
+          <div id="ai-extraction-card" class="ai-extraction-card" style="display:none;">
+            <div class="ai-ext-header">
+              <div class="ai-ext-cat">
+                <strong id="ai-detected-cat-title">Detected: Financial Cyber Fraud</strong>
+                <span id="ai-detected-urgency" class="urgency-badge">⚡ High Urgency · Golden Hour Active</span>
+              </div>
+              <button type="button" class="btn btn-primary" onclick="applyAiAndProceed()" style="padding:6px 14px; font-size:0.82rem;">
+                <span data-en="Proceed to Step 2 →" data-hi="कदम 2 पर जाएं →">Proceed to Step 2 →</span>
+              </button>
+            </div>
+            <div class="ai-ext-entities" id="ai-ext-entities-grid"></div>
+          </div>
+
+          <!-- Judge / Evaluator 1-Click Demo Scenarios -->
+          <div class="ai-demo-presets">
+            <span class="preset-label" data-en="Judge Quick Scenarios:" data-hi="त्वरित डेमो परिदृश्य:">Judge Quick Scenarios:</span>
+            <div class="preset-chips">
+              <button type="button" class="preset-chip" onclick="loadJudgeScenario('electricity')">⚡ ₹48,500 Power Bill Scam</button>
+              <button type="button" class="preset-chip" onclick="loadJudgeScenario('sextortion')">⚡ Instagram Video Extortion</button>
+              <button type="button" class="preset-chip" onclick="loadJudgeScenario('apk_loan')">⚡ Malicious Loan APK</button>
+              <button type="button" class="preset-chip" onclick="loadJudgeScenario('aadhaar_sim')">⚡ Aadhaar SIM Swap</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Situation Selector (Primary Action Area) -->
+      <div class="section-title-area">
+        <span class="section-kicker" data-en="File a Report" data-hi="रिपोर्ट दर्ज करें">File a Report</span>
+        <h2 class="section-heading" data-en="What happened to you?" data-hi="आपके साथ क्या हुआ?">What happened to you?</h2>
+        <p class="section-sub" data-en="Select the situation closest to yours. No technical or legal jargon required." data-hi="अपनी स्थिति के सबसे करीब विकल्प चुनें। किसी तकनीकी या कानूनी भाषा की आवश्यकता नहीं।">Select the situation closest to yours. No technical or legal jargon required.</p>
+      </div>
+
+      <div class="situation-grid">
+        <div class="sit-card" onclick="startFlow('money')">
+          <div>
+            <div class="sit-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <h3 data-en="I've lost money" data-hi="मेरा पैसा गया है">I've lost money</h3>
+            <p data-en="UPI, Netbanking, OTP fraud, fake job offers or investment scams." data-hi="UPI, नेटबैंकिंग, OTP फ्रॉड, फर्जी नौकरी या निवेश धोखाधड़ी।">UPI, Netbanking, OTP fraud, fake job offers or investment scams.</p>
+          </div>
+          <span class="sit-tag" data-en="Priority handling for financial fraud" data-hi="वित्तीय धोखाधड़ी के लिए प्राथमिकता">Priority handling for financial fraud</span>
+        </div>
+
+        <div class="sit-card" onclick="startFlow('harass')">
+          <div>
+            <div class="sit-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 4v5c0 5-3.5 7.5-7 9-3.5-1.5-7-4-7-9V7l7-4z"/></svg>
+            </div>
+            <h3 data-en="Threats or blackmail" data-hi="धमकी या ब्लैकमेल">Threats or blackmail</h3>
+            <p data-en="Morphed photos, video blackmail, extortion, or stalking." data-hi="मॉर्फ्ड फोटो, वीडियो ब्लैकमेल, जबरन वसूली या पीछा करना।">Morphed photos, video blackmail, extortion, or stalking.</p>
+          </div>
+          <span class="sit-tag" data-en="Anonymous reporting available" data-hi="गुमनाम रिपोर्टिंग उपलब्ध">Anonymous reporting available</span>
+        </div>
+
+        <div class="sit-card" onclick="startFlow('hack')">
+          <div>
+            <div class="sit-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+            </div>
+            <h3 data-en="Hacked account or phone" data-hi="हैक अकाउंट या फोन">Hacked account or phone</h3>
+            <p data-en="Compromised WhatsApp, Instagram, email, or malicious APKs." data-hi="हैक व्हाट्सएप, इंस्टाग्राम, ईमेल या दुर्भावनापूर्ण APK।">Compromised WhatsApp, Instagram, email, or malicious APKs.</p>
+          </div>
+          <span class="sit-tag" data-en="Security & recovery steps" data-hi="सुरक्षा और पुनर्प्राप्ति कदम">Security & recovery steps</span>
+        </div>
+
+        <div class="sit-card" onclick="startFlow('check')">
+          <div>
+            <div class="sit-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </div>
+            <h3 data-en="Check something suspicious" data-hi="संदिग्ध गतिविधि जांचें">Check something suspicious</h3>
+            <p data-en="Search a phone number, UPI ID, or website link before paying." data-hi="भुगतान करने से पहले फोन नंबर, UPI ID या लिंक जांचें।">Search a phone number, UPI ID, or website link before paying.</p>
+          </div>
+          <span class="sit-tag" data-en="Instant lookup in 5s" data-hi="5 सेकंड में त्वरित खोज">Instant lookup in 5s</span>
+        </div>
+      </div>
+
+      <!-- Trust Bar -->
+      <div class="trust-bar">
+        <div class="trust-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          <span data-en="24×7 Instant Filing" data-hi="24×7 त्वरित रिपोर्टिंग">24×7 Instant Filing</span>
+        </div>
+        <div class="trust-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span data-en="Reports routed to your state cyber cell" data-hi="रिपोर्ट आपके राज्य साइबर सेल को भेजी जाती है">Reports routed to your state cyber cell</span>
+        </div>
+        <div class="trust-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+          <span data-en="Follows RBI cyber-fraud guidelines" data-hi="RBI साइबर-धोखाधड़ी दिशानिर्देशों का पालन">Follows RBI cyber-fraud guidelines</span>
+        </div>
+      </div>
+
+      <!-- Demo Navigation Utility Toolbar (Competition Judges - Deprioritized Below Main Flow) -->
+      <div class="demo-shortcuts">
+        <span class="demo-label">Demo shortcuts — jump to any screen:</span>
+        <button type="button" class="demo-chip" onclick="quickDemoFraud()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          <span>90s Fraud Report</span>
+        </button>
+        <button type="button" class="demo-chip" onclick="showScreen('screen-admin'); loadAdminQueue();">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Officials Queue</span>
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==================== 2. 30-SECOND SCAM DIAGNOSTIC ==================== -->
+  <section class="screen" id="screen-diagnostic">
+    <div class="wrap tool-wrap">
+      <button class="back-link" onclick="showScreen('screen-home')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        <span data-en="Back to Home" data-hi="होम पर वापस जाएं">Back to Home</span>
+      </button>
+
+      <span class="section-kicker" data-en="Interactive Triage" data-hi="इंटरएक्टिव ट्राइएज">Interactive Triage</span>
+      <h2 class="section-heading" data-en="Check a Scam — Instant Recovery Steps" data-hi="स्कैम जांचें — त्वरित सुरक्षा और बचाव कदम">Check a Scam — Instant Recovery Steps</h2>
+      <p class="section-sub" data-en="Select the scenario that matches what happened for instant containment and recovery steps:" data-hi="तत्काल सुरक्षा और पुनर्प्राप्ति कदमों के लिए अपनी स्थिति से मेल खाता विकल्प चुनें:">Select the scenario that matches what happened for instant containment and recovery steps:</p>
+
+      <div class="diag-grid-layout">
+        <div class="diag-item-card" onclick="showDiagResult('digital_arrest')">
+          <h3 data-en="Fake Police Video Call ('Digital Arrest')" data-hi="फर्जी पुलिस वीडियो कॉल ('डिजिटल अरेस्ट')">Fake Police Video Call ('Digital Arrest')</h3>
+          <p data-en="Person in uniform on Skype/WhatsApp claiming your Aadhaar is linked to crimes and demanding payment." data-hi="वर्दी में कोई व्यक्ति दावा कर रहा है कि आपका आधार अपराधों से जुड़ा है और पैसे मांग रहा है।">Person in uniform on Skype/WhatsApp claiming your Aadhaar is linked to crimes and demanding payment.</p>
+        </div>
+
+        <div class="diag-item-card" onclick="showDiagResult('upi_fraud')">
+          <h3 data-en="UPI / Telegram Part-Time Job Scam" data-hi="UPI / टेलीग्राम पार्ट-टाइम जॉब फ्रॉड">UPI / Telegram Part-Time Job Scam</h3>
+          <p data-en="Paid money for task ratings, crypto investment, or scanned QR code expecting to receive funds." data-hi="टास्क रेटिंग, निवेश के नाम पर पैसे दिए या पैसे पाने के भ्रम में QR स्कैन किया।">Paid money for task ratings, crypto investment, or scanned QR code expecting to receive funds.</p>
+        </div>
+
+        <div class="diag-item-card" onclick="showDiagResult('sextortion')">
+          <h3 data-en="Video / Photo Blackmail (Sextortion)" data-hi="वीडियो / फोटो ब्लैकमेल (सेक्सटॉर्शन)">Video / Photo Blackmail (Sextortion)</h3>
+          <p data-en="Blackmailer threatening to send recorded or morphed private media to your family/contacts." data-hi="ब्लैकमेलर आपके संपर्कों को निजी या मॉर्फ्ड मीडिया भेजने की धमकी दे रहा है।">Blackmailer threatening to send recorded or morphed private media to your family/contacts.</p>
+        </div>
+
+        <div class="diag-item-card" onclick="showDiagResult('apk_bill')">
+          <h3 data-en="Electricity Bill / Courier .APK Link" data-hi="बिजली बिल / कूरियर .APK लिंक">Electricity Bill / Courier .APK Link</h3>
+          <p data-en="Downloaded an APK file from SMS/WhatsApp claiming electricity will be disconnected tonight." data-hi="एसएमएस/व्हाट्सएप से एपीके डाउनलोड किया जिसमें बिजली कटने का दावा किया गया था।">Downloaded an APK file from SMS/WhatsApp claiming electricity will be disconnected tonight.</p>
+        </div>
+      </div>
+
+      <!-- Result Card -->
+      <div id="diag-result-card" class="diag-result-panel">
+        <div id="diag-result-content"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 3. CITIZEN LEARNING CORNER ==================== -->
+  <section class="screen" id="screen-learning">
+    <div class="wrap tool-wrap">
+      <button class="back-link" onclick="showScreen('screen-home')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        <span data-en="Back to Home" data-hi="होम पर वापस जाएं">Back to Home</span>
+      </button>
+
+      <span class="section-kicker" data-en="I4C & MHA Awareness Initiative" data-hi="I4C एवं गृह मंत्रालय जागरूकता पहल">I4C & MHA Awareness Initiative</span>
+      <h2 class="section-heading" data-en="Citizen Cyber Safety Tips & Guidebook" data-hi="नागरिक साइबर सुरक्षा टिप्स एवं गाइडबुक">Citizen Cyber Safety Tips & Guidebook</h2>
+      <p class="section-sub" data-en="Interactive cyber hygiene audits, scam modus operandi breakdowns, and official citizen manuals designed to protect you and your family." data-hi="इंटरएक्टिव साइबर सुरक्षा ऑडिट, धोखाधड़ी के तरीकों का विश्लेषण और आपको व आपके परिवार को सुरक्षित रखने के लिए आधिकारिक गाइड।">Interactive cyber hygiene audits, scam modus operandi breakdowns, and official citizen manuals designed to protect you and your family.</p>
+
+      <!-- Interactive 60-Second Cyber Resilience Audit -->
+      <div class="audit-box" style="margin-top:24px;">
+        <div class="audit-header">
+          <div>
+            <h3 style="font-size:1.15rem;" data-en="60-Second Cyber Hygiene Self-Audit" data-hi="60-सेकंड साइबर सुरक्षा स्व-ऑडिट">60-Second Cyber Hygiene Self-Audit</h3>
+            <p style="font-size:0.86rem; color:var(--text-muted); margin-top:2px;" data-en="Check all habits you actively follow to calculate your live cyber defense score:" data-hi="अपने लाइव साइबर सुरक्षा स्कोर की गणना करने के लिए उन आदतों को चुनें जिनका आप पालन करते हैं:">Check all habits you actively follow to calculate your live cyber defense score:</p>
+          </div>
+          <div class="audit-score-pill" id="audit-score-display">Score: 100/100 · Optimal</div>
+        </div>
+
+        <div class="audit-item">
+          <input type="checkbox" id="aud-1" checked onchange="updateAuditScore()">
+          <div>
+            <label for="aud-1" data-en="1. Two-Factor Authentication (2FA) is turned ON on my WhatsApp, Google, and Instagram." data-hi="1. मेरे व्हाट्सएप, गूगल और इंस्टाग्राम पर टू-फैक्टर ऑथेंटिकेशन (2FA) चालू है।">1. Two-Factor Authentication (2FA) is turned ON on my WhatsApp, Google, and Instagram.</label>
+            <p data-en="Prevents 99.8% of unauthorized account takeovers even if your password leaks." data-hi="पासवर्ड लीक होने पर भी 99.8% अनधिकृत अकाउंट हैक को रोकता है।">Prevents 99.8% of unauthorized account takeovers even if your password leaks.</p>
+          </div>
+        </div>
+
+        <div class="audit-item">
+          <input type="checkbox" id="aud-2" checked onchange="updateAuditScore()">
+          <div>
+            <label for="aud-2" data-en="2. I NEVER enter my UPI PIN to receive money or cashback." data-hi="2. मैं पैसे या कैशबैक प्राप्त करने के लिए कभी भी अपना UPI पिन दर्ज नहीं करता।">2. I NEVER enter my UPI PIN to receive money or cashback.</label>
+            <p data-en="Golden Rule: UPI PIN is ONLY used to send money out of your account. Receiving money never requires a PIN." data-hi="मूल नियम: UPI पिन का उपयोग केवल पैसे भेजने के लिए होता है। पैसे प्राप्त करने के लिए पिन की आवश्यकता नहीं होती।">Golden Rule: UPI PIN is ONLY used to send money out of your account. Receiving money never requires a PIN.</p>
+          </div>
+        </div>
+
+        <div class="audit-item">
+          <input type="checkbox" id="aud-3" checked onchange="updateAuditScore()">
+          <div>
+            <label for="aud-3" data-en="3. I never install unknown .APK files received via SMS, WhatsApp, or Telegram." data-hi="3. मैं एसएमएस, व्हाट्सएप या टेलीग्राम से प्राप्त अज्ञात .APK फाइलें कभी इंस्टॉल नहीं करता।">3. I never install unknown .APK files received via SMS, WhatsApp, or Telegram.</label>
+            <p data-en="Fake electricity bill, courier, and KYC APKs install Remote Access Trojans (RATs) that steal banking OTPs." data-hi="फर्जी बिजली बिल और KYC एपीके रिमोट ट्रोजन इंस्टॉल करते हैं जो बैंकिंग OTP चुराते हैं।">Fake electricity bill, courier, and KYC APKs install Remote Access Trojans (RATs) that steal banking OTPs.</p>
+          </div>
+        </div>
+
+        <div class="audit-item">
+          <input type="checkbox" id="aud-4" checked onchange="updateAuditScore()">
+          <div>
+            <label for="aud-4" data-en="4. I know that Indian Police, CBI, Customs, and ED NEVER arrest citizens on video calls." data-hi="4. मुझे पता है कि भारतीय पुलिस, CBI और ED कभी भी वीडियो कॉल पर नागरिकों को गिरफ्तार नहीं करते।">4. I know that Indian Police, CBI, Customs, and ED NEVER arrest citizens on video calls.</label>
+            <p data-en="'Digital Arrest' does not exist under any Indian law. Such video calls are 100% criminal extortion." data-hi="भारतीय कानून में 'डिजिटल अरेस्ट' का कोई प्रावधान नहीं है। ऐसी कॉल 100% आपराधिक जबरन वसूली हैं।">"Digital Arrest" does not exist under any Indian law. Such video calls are 100% criminal extortion.</p>
+          </div>
+        </div>
+
+        <div class="audit-item">
+          <input type="checkbox" id="aud-5" checked onchange="updateAuditScore()">
+          <div>
+            <label for="aud-5" data-en="5. I have saved the National Cybercrime Helpline 1930 in my phone contacts." data-hi="5. मैंने अपने फोन संपर्कों में राष्ट्रीय साइबर अपराध हेल्पलाइन 1930 को सहेजा है।">5. I have saved the National Cybercrime Helpline 1930 in my phone contacts.</label>
+            <p data-en="Calling within 2–4 hours (Golden Hour) provides over 70% chance of freezing stolen money in beneficiary accounts." data-hi="2-4 घंटे (गोल्डन ऑवर) के भीतर कॉल करने से चोरी हुए पैसे को फ्रीज करने की 70% से अधिक संभावना होती है।">Calling within 2–4 hours (Golden Hour) provides over 70% chance of freezing stolen money in beneficiary accounts.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter Buttons -->
+      <div class="lc-filters-bar">
+        <button type="button" class="lc-filter-btn active" onclick="filterLearningCorner('all', this)" data-en="All Topics (6)" data-hi="सभी विषय (6)">All Topics (6)</button>
+        <button type="button" class="lc-filter-btn" onclick="filterLearningCorner('banking', this)" data-en="Banking & UPI" data-hi="बैंकिंग व UPI">Banking & UPI</button>
+        <button type="button" class="lc-filter-btn" onclick="filterLearningCorner('extortion', this)" data-en="Digital Arrest" data-hi="डिजिटल अरेस्ट">Digital Arrest</button>
+        <button type="button" class="lc-filter-btn" onclick="filterLearningCorner('malware', this)" data-en="APK Trojans" data-hi="APK ट्रोजन">APK Trojans</button>
+        <button type="button" class="lc-filter-btn" onclick="filterLearningCorner('safety', this)" data-en="Women & Child Safety" data-hi="महिला व बाल सुरक्षा">Women & Child Safety</button>
+      </div>
+
+      <!-- Guides Grid -->
+      <div class="lc-guides-grid" id="lc-guides-grid">
+        
+        <!-- Guide 1: Digital Arrest -->
+        <div class="lc-card" data-cat="extortion">
+          <div>
+            <span class="lc-card-tag" style="color:var(--emergency-text); background:var(--emergency-bg);">Critical Advisory</span>
+            <h3 data-en="'Digital Arrest' & Police Video Call Extortion" data-hi="'डिजिटल अरेस्ट' और फर्जी पुलिस वीडियो कॉल जबरन वसूली">'Digital Arrest' & Police Video Call Extortion</h3>
+            <p data-en="Fraudsters wear fake police uniforms on Skype, display forged Supreme Court/CBI warrants, and claim your Aadhaar is linked to narcotic parcels in Mumbai." data-hi="धोखेबाज़ स्काइप पर नकली वर्दी पहनते हैं, फर्जी वारंट दिखाते हैं और दावा करते हैं कि आपका आधार नशीली दवाओं के पार्सल से जुड़ा है।">Fraudsters wear fake police uniforms on Skype, display forged Supreme Court/CBI warrants, and claim your Aadhaar is linked to narcotic parcels in Mumbai.</p>
+            <ul class="lc-card-list">
+              <li><strong>The Law:</strong> No law enforcement agency conducts trials or arrests over video calls.</li>
+              <li><strong>Never Pay:</strong> There is no such thing as an "RBI Verification Escrow Account".</li>
+              <li><strong>Immediate Step:</strong> Hang up immediately and file a report on this portal.</li>
+            </ul>
+          </div>
+          <div class="lc-card-action">
+            <span style="color:var(--text-muted);">MHA Advisory #2024/09</span>
+            <button type="button" class="demo-chip" onclick="showDiagResult('digital_arrest'); showScreen('screen-diagnostic');">Launch Triage →</button>
+          </div>
+        </div>
+
+        <!-- Guide 2: UPI Inversion -->
+        <div class="lc-card" data-cat="banking">
+          <div>
+            <span class="lc-card-tag" style="color:#0369A1; background:#E0F2FE;">Financial Defense</span>
+            <h3 data-en="UPI QR Code & 'Collect Request' Trap" data-hi="UPI QR कोड और फर्जी रिफंड ट्रैप">UPI QR Code & 'Collect Request' Trap</h3>
+            <p data-en="Scammers impersonate buyers on OLX or customer support agents sending you a QR code claiming 'Scan to receive your refund/cashback'." data-hi="धोखेबाज़ ओएलएक्स खरीदार या कस्टमर सपोर्ट बनकर QR कोड भेजते हैं और दावा करते हैं कि 'पैसे पाने के लिए स्कैन करें'।">Scammers impersonate buyers on OLX or customer support agents sending you a QR code claiming 'Scan to receive your refund/cashback'.</p>
+            <ul class="lc-card-list">
+              <li><strong>Golden Rule:</strong> Entering your UPI PIN ALWAYS debits money from your account.</li>
+              <li><strong>No PIN for Receiving:</strong> Receiving money requires only your phone number or UPI ID.</li>
+              <li><strong>Lien Action:</strong> If money is lost, call 1930 within the Golden Hour.</li>
+            </ul>
+          </div>
+          <div class="lc-card-action">
+            <span style="color:var(--text-muted);">NPCI Security Directive</span>
+            <button type="button" class="demo-chip" onclick="showScreen('screen-rbi')">RBI Letter Tool →</button>
+          </div>
+        </div>
+
+        <!-- Guide 3: APK Trojan -->
+        <div class="lc-card" data-cat="malware">
+          <div>
+            <span class="lc-card-tag" style="color:#92400E; background:#FEF3C7;">Device Threat</span>
+            <h3 data-en="Electricity Bill & Courier .APK Malware" data-hi="बिजली बिल और कूरियर .APK मैलवेयर">Electricity Bill & Courier .APK Malware</h3>
+            <p data-en="Urgent SMS messages warning that your electricity will be disconnected tonight at 9:30 PM, instructing you to install an APK file from a link." data-hi="बिजली कटने की चेतावनी देने वाले संदेश जो आपको एक लिंक से एपीके फाइल इंस्टॉल करने का निर्देश देते हैं।">Urgent SMS messages warning that your electricity will be disconnected tonight at 9:30 PM, instructing you to install an APK file from a link.</p>
+            <ul class="lc-card-list">
+              <li><strong>Remote Trojan:</strong> The APK intercepts and forwards banking SMS and OTPs silently.</li>
+              <li><strong>Immediate Fix:</strong> Turn on Airplane Mode to stop data transfer, then uninstall.</li>
+              <li><strong>Bank Alert:</strong> Temporarily freeze netbanking credentials from another phone.</li>
+            </ul>
+          </div>
+          <div class="lc-card-action">
+            <span style="color:var(--text-muted);">CERT-In Vulnerability Note</span>
+            <button type="button" class="demo-chip" onclick="showDiagResult('apk_bill'); showScreen('screen-diagnostic');">Malware Steps →</button>
+          </div>
+        </div>
+
+        <!-- Guide 4: Telegram Job Scam -->
+        <div class="lc-card" data-cat="banking">
+          <div>
+            <span class="lc-card-tag" style="color:#0369A1; background:#E0F2FE;">Employment Scam</span>
+            <h3 data-en="Telegram Part-Time Task & Crypto Scam" data-hi="टेलीग्राम पार्ट-टाइम टास्क व निवेश फ्रॉड">Telegram Part-Time Task & Crypto Scam</h3>
+            <p data-en="Offers paying ₹500/hour for liking YouTube videos or reviewing Google Maps hotels, later demanding deposit 'investments' to withdraw earnings." data-hi="यूट्यूब वीडियो लाइक करने के लिए ₹500/घंटे का वादा, बाद में कमाई निकालने के लिए 'जमा' की मांग।">Offers paying ₹500/hour for liking YouTube videos or reviewing Google Maps hotels, later demanding deposit 'investments' to withdraw earnings.</p>
+            <ul class="lc-card-list">
+              <li><strong>Psychological Hook:</strong> Small initial payments (₹150–₹300) build false trust.</li>
+              <li><strong>The Reality:</strong> Funds in the "crypto dashboard" are simulated numbers.</li>
+              <li><strong>Protection:</strong> Real employers never ask you to pay money to get paid.</li>
+            </ul>
+          </div>
+          <div class="lc-card-action">
+            <span style="color:var(--text-muted);">I4C Intelligence Alert</span>
+            <button type="button" class="demo-chip" onclick="startFlow('money')">Report Fraud →</button>
+          </div>
+        </div>
+
+        <!-- Guide 5: Sextortion & Morphing -->
+        <div class="lc-card" data-cat="safety">
+          <div>
+            <span class="lc-card-tag" style="color:#6D28D9; background:#F5F3FF;">Strict Privacy</span>
+            <h3 data-en="Video Blackmail & AI Morphed Photos" data-hi="वीडियो ब्लैकमेल और AI मॉर्फ्ड फोटो">Video Blackmail & AI Morphed Photos</h3>
+            <p data-en="Criminal syndicates use recorded video call snippets or AI face-swapped media to blackmail victims for continuous ransom payments." data-hi="आपराधिक गिरोह पीड़ितों को ब्लैकमेल करने के लिए वीडियो क्लिप या AI मॉर्फ्ड मीडिया का उपयोग करते हैं।">Criminal syndicates use recorded video call snippets or AI face-swapped media to blackmail victims for continuous ransom payments.</p>
+            <ul class="lc-card-list">
+              <li><strong>Do NOT Pay:</strong> Paying ransom never deletes media; it only escalates demands.</li>
+              <li><strong>Anonymous Path:</strong> Use our confidential anonymous reporting pathway to protect identity.</li>
+              <li><strong>Legal Backing:</strong> Penalized under IT Act Sec 66E, 67, 67A with up to 5 yrs imprisonment.</li>
+            </ul>
+          </div>
+          <div class="lc-card-action">
+            <span style="color:var(--text-muted);">Women & Child Cyber Protection</span>
+            <button type="button" class="demo-chip" onclick="startFlow('harass')">Anonymous Report →</button>
+          </div>
+        </div>
+
+        <!-- Guide 6: SIM Swap & eSIM -->
+        <div class="lc-card" data-cat="banking">
+          <div>
+            <span class="lc-card-tag" style="color:#0F766E; background:#F0FDFA;">Telecom Security</span>
+            <h3 data-en="SIM Swap & Unauthorized eSIM Porting" data-hi="सिम स्वैप और अनधिकृत eSIM पोर्टिंग">SIM Swap & Unauthorized eSIM Porting</h3>
+            <p data-en="Fraudsters trick telecom customer care into issuing a duplicate SIM or eSIM QR code, disabling your phone while intercepting your banking OTPs." data-hi="धोखेबाज़ टेलीकॉम से डुप्लीकेट सिम ले लेते हैं, जिससे आपका फोन बंद हो जाता है और उन्हें OTP मिल जाते हैं।">Fraudsters trick telecom customer care into issuing a duplicate SIM or eSIM QR code, disabling your phone while intercepting your banking OTPs.</p>
+            <ul class="lc-card-list">
+              <li><strong>Early Warning:</strong> Sudden "No Service" or network disconnection on your primary phone.</li>
+              <li><strong>Action:</strong> Immediately call your telecom provider from another phone to block the SIM.</li>
+              <li><strong>Bank Alert:</strong> Inform your bank immediately to freeze SMS-based transaction channels.</li>
+            </ul>
+          </div>
+          <div class="lc-card-action">
+            <span style="color:var(--text-muted);">DoT Security Advisory</span>
+            <button type="button" class="demo-chip" onclick="showScreen('screen-suspect')">Verify Number →</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Citizen Manual & Statutory Rights Section -->
+      <div style="margin-top:48px;">
+        <h3 style="font-size:1.3rem; margin-bottom:6px;" data-en="Official Citizen Manuals & Statutory Rights" data-hi="आधिकारिक नागरिक मैनुअल और वैधानिक अधिकार">Official Citizen Manuals & Statutory Rights</h3>
+        <p style="color:var(--text-muted); font-size:0.92rem; margin-bottom:20px;">Essential reference guides summarizing your legal rights under Indian Cyber Laws and RBI mandates:</p>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:16px;">
+          <div style="background:var(--card); border:1px solid var(--border); border-radius:var(--radius-md); padding:20px;">
+            <strong style="display:block; font-size:0.98rem; margin-bottom:4px;" data-en="NCRP Complaint Lifecycle Manual" data-hi="NCRP शिकायत जीवनचक्र मैनुअल">NCRP Complaint Lifecycle Manual</strong>
+            <p style="font-size:0.86rem; color:var(--text-muted); line-height:1.45;">Step-by-step breakdown of how complaints are received by I4C, assigned to district Cyber Crime Police Stations, and converted to formal FIRs.</p>
+          </div>
+
+          <div style="background:var(--card); border:1px solid var(--border); border-radius:var(--radius-md); padding:20px;">
+            <strong style="display:block; font-size:0.98rem; margin-bottom:4px;" data-en="RBI Zero-Liability Customer Charter" data-hi="RBI शून्य-देयता ग्राहक अधिकार">RBI Zero-Liability Customer Charter</strong>
+            <p style="font-size:0.86rem; color:var(--text-muted); line-height:1.45;">Mandates that unauthorized electronic transactions notified within 3 working days carry ZERO customer liability with mandatory 10-day shadow credit.</p>
+          </div>
+
+          <div style="background:var(--card); border:1px solid var(--border); border-radius:var(--radius-md); padding:20px;">
+            <strong style="display:block; font-size:0.98rem; margin-bottom:4px;" data-en="Evidence Preservation Standard (Sec 65B)" data-hi="साक्ष्य संरक्षण मानक (धारा 65B)">Evidence Preservation Standard (Sec 65B)</strong>
+            <p style="font-size:0.86rem; color:var(--text-muted); line-height:1.45;">How to preserve timestamped screenshots, bank transaction UTR numbers, SMS logs, and email headers as legally admissible evidence in Indian courts.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==================== 4. RBI DISPUTE LETTER GENERATOR ==================== -->
+  <section class="screen" id="screen-rbi">
+    <div class="wrap tool-wrap">
+      <button class="back-link" onclick="showScreen('screen-home')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        <span data-en="Back to Home" data-hi="होम पर वापस जाएं">Back to Home</span>
+      </button>
+
+      <span class="section-kicker" data-en="Statutory Protection" data-hi="वैधानिक सुरक्षा">Statutory Protection</span>
+      <h2 class="section-heading" data-en="RBI 3-Day Zero-Liability Dispute Notice Generator" data-hi="RBI 3-दिवसीय शून्य-देयता विवाद पत्र जेनरेटर">RBI 3-Day Zero-Liability Dispute Notice Generator</h2>
+      <p class="section-sub" data-en="Under RBI Circular DBR.No.Leg.BC.78/09.07.005/2017-18, you have ZERO liability if electronic fraud is notified to your bank within 3 working days. Generate your formal legal notice instantly." data-hi="RBI परिपत्र के तहत 3 कार्य दिवसों के भीतर बैंक को सूचित करने पर आपकी शून्य देयता होती है। अपना नोटिस तुरंत बनाएं।">Under RBI Circular DBR.No.Leg.BC.78/09.07.005/2017-18, you have ZERO liability if electronic fraud is notified to your bank within 3 working days. Generate your formal legal notice instantly.</p>
+
+      <div class="rbi-grid">
+        <!-- Form -->
+        <div class="rbi-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <h3 style="font-size:1.05rem;" data-en="Dispute Details" data-hi="विवाद विवरण">Dispute Details</h3>
+            <button type="button" class="demo-chip" onclick="autoFillRbiSample()">Auto-Fill Sample</button>
+          </div>
+
+          <div class="input-group">
+            <label data-en="Account Holder Full Name" data-hi="खाताधारक का नाम">Account Holder Full Name</label>
+            <input type="text" id="rbi-name" class="clean-input" value="Rajesh Kumar Sharma" oninput="updateRbiLetter()">
+          </div>
+
+          <div class="input-group">
+            <label data-en="Bank Name" data-hi="बैंक का नाम">Bank Name</label>
+            <select id="rbi-bank" class="clean-input" onchange="updateRbiLetter()">
+              <option value="State Bank of India">State Bank of India (SBI)</option>
+              <option value="HDFC Bank">HDFC Bank</option>
+              <option value="ICICI Bank">ICICI Bank</option>
+              <option value="Punjab National Bank">Punjab National Bank (PNB)</option>
+              <option value="Bank of Baroda">Bank of Baroda</option>
+              <option value="Axis Bank">Axis Bank</option>
+            </select>
+          </div>
+
+          <div class="input-group">
+            <label data-en="Disputed Amount (₹)" data-hi="विवादित राशि (₹)">Disputed Amount (₹)</label>
+            <input type="text" id="rbi-amount" class="clean-input" value="₹ 45,000" oninput="updateRbiLetter()">
+          </div>
+
+          <div class="input-group">
+            <label data-en="Account / UPI VPA" data-hi="खाता / UPI VPA">Account / UPI VPA</label>
+            <input type="text" id="rbi-account" class="clean-input" value="A/C No. XXXXXXXX4920 / UPI: rajesh@okhdfc" oninput="updateRbiLetter()">
+          </div>
+
+          <div class="input-group">
+            <label data-en="Transaction ID / UTR" data-hi="ट्रांजेक्शन UTR">Transaction ID / UTR</label>
+            <input type="text" id="rbi-utr" class="clean-input" value="UPI/428194018291" oninput="updateRbiLetter()">
+          </div>
+
+          <div class="input-group">
+            <label data-en="NCRP Complaint Ref No." data-hi="NCRP संदर्भ संख्या">NCRP Complaint Ref No.</label>
+            <input type="text" id="rbi-ncrp" class="clean-input" value="NCRP2026849201" oninput="updateRbiLetter()">
+          </div>
+        </div>
+
+        <!-- Sheet Preview -->
+        <div>
+          <div class="rbi-letter-sheet" id="rbi-letter-output"></div>
+          <div style="display:flex; gap:10px; margin-top:16px;">
+            <button type="button" class="btn btn-primary" onclick="copyRbiLetter()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span data-en="Copy Dispute Letter" data-hi="पत्र कॉपी करें">Copy Dispute Letter</span>
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="window.print()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+              <span data-en="Print / Save PDF" data-hi="प्रिंट करें">Print / Save PDF</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 4. REPORT FLOW WIZARD ==================== -->
+  <section class="screen" id="screen-flow">
+    <div class="wrap flow-container">
+      <button class="back-link" onclick="showScreen('screen-home')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        <span data-en="Cancel and return home" data-hi="रद्द करें और होम पर जाएं">Cancel and return home</span>
+      </button>
+
+      <h2 id="fh-title" style="margin-bottom:6px;">Reporting: Financial Fraud</h2>
+      <p style="color:var(--text-muted); font-size:0.95rem; margin-bottom:24px;">Takes about 90 seconds. Your report is securely routed to the state Cyber Cell.</p>
+
+      <!-- Stepper -->
+      <div class="stepper-row">
+        <div class="stepper-line"></div>
+        <div class="stepper-line-fill" id="stepper-track-fill"></div>
+        
+        <div class="step-node active" data-step="1">
+          <span class="step-circle">1</span>
+          <span class="step-text" data-en="Category" data-hi="श्रेणी">Category</span>
+        </div>
+        <div class="step-node" data-step="2">
+          <span class="step-circle">2</span>
+          <span class="step-text" data-en="Incident" data-hi="घटना">Incident</span>
+        </div>
+        <div class="step-node" data-step="3">
+          <span class="step-circle">3</span>
+          <span class="step-text" data-en="Details" data-hi="विवरण">Details</span>
+        </div>
+        <div class="step-node" data-step="4">
+          <span class="step-circle">4</span>
+          <span class="step-text" data-en="Review" data-hi="समीक्षा">Review</span>
+        </div>
+      </div>
+
+      <div class="form-card">
+        
+        <!-- Step 1 -->
+        <div class="step-panel active" id="panel-1">
+          <div class="input-group">
+            <label data-en="Confirm Complaint Category" data-hi="शिकायत श्रेणी की पुष्टि करें">Confirm Complaint Category</label>
+            <p class="field-hint" data-en="Choose the closest match:" data-hi="सबसे उपयुक्त विकल्प चुनें:">Choose the closest match:</p>
+            <select id="situation-select" class="clean-input" onchange="onSituationChange(this.value)">
+              <option value="money" data-en="Financial Fraud (Lost Money)" data-hi="वित्तीय धोखाधड़ी (पैसा गंवाया)">Financial Fraud (Lost Money)</option>
+              <option value="harass" data-en="Threats, Extortion or Blackmail" data-hi="धमकी, जबरन वसूली या ब्लैकमेल">Threats, Extortion or Blackmail</option>
+              <option value="hack" data-en="Hacked Account or Device" data-hi="हैक किया गया अकाउंट या डिवाइस">Hacked Account or Device</option>
+              <option value="check" data-en="Checking Suspicious Activity" data-hi="संदिग्ध गतिविधि की जांच">Checking Suspicious Activity</option>
+            </select>
+          </div>
+
+          <div class="btn-row">
+            <span></span>
+            <button class="btn btn-primary" onclick="goToStep(2)">
+              <span data-en="Continue" data-hi="जारी रखें">Continue</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" width="16" height="16"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="step-panel" id="panel-2">
+          <!-- Fast Fill Chips -->
+          <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-bottom:16px;">
+            <span style="font-size:0.80rem; font-weight:700; color:var(--text-muted);" data-en="Quick Fill:" data-hi="त्वरित सुझाव:">Quick Fill:</span>
+            <button type="button" class="demo-chip" onclick="quickFillForm('upi')">UPI Fraud ₹45k</button>
+            <button type="button" class="demo-chip" onclick="quickFillForm('digital_arrest')">Digital Arrest</button>
+            <button type="button" class="demo-chip" onclick="quickFillForm('telegram_job')">Telegram Task ₹85k</button>
+            <button type="button" class="demo-chip" onclick="quickFillForm('stock_trading')">Fake IPO App ₹2.1L</button>
+            <button type="button" class="demo-chip" onclick="quickFillForm('electricity')">Electricity Bill SMS</button>
+            <button type="button" class="demo-chip" onclick="quickFillForm('hack')">WhatsApp Takeover</button>
+            <button type="button" class="demo-chip" onclick="quickFillForm('sextortion')">Video Extortion</button>
+          </div>
+
+          <div class="input-group">
+            <label data-en="Describe what happened" data-hi="बताएं क्या हुआ">Describe what happened</label>
+            <p class="field-hint" data-en="Include date, amount lost, phone number or UPI handle involved." data-hi="तारीख, खोई हुई राशि, फोन नंबर या UPI हैंडल शामिल करें।">Include date, amount lost, phone number or UPI handle involved.</p>
+            <textarea id="description" class="clean-input" oninput="updateCharCount()" placeholder="On 14 August, I received a call claiming to be KYC support..."></textarea>
+            <div style="display:flex; justify-content:space-between; font-size:0.78rem; color:var(--text-muted); margin-top:4px;">
+              <span id="char-count">0 characters</span>
+              <span style="color:var(--success);">✓ Good detail helps police</span>
+            </div>
+          </div>
+
+          <div class="incident-meta-grid">
+            <div class="input-group">
+              <label data-en="When did this occur?" data-hi="यह कब हुआ?">When did this occur?</label>
+              <input type="date" id="incident-date" class="clean-input">
+            </div>
+            <div class="input-group">
+              <label data-en="Reporting Timeline / Delay Reason" data-hi="रिपोर्टिंग समय सीमा / देरी का कारण">Reporting Timeline / Delay Reason</label>
+              <select id="delay-reason" class="clean-input">
+                <option value="prompt" data-en="Reported promptly (<24 hrs)" data-hi="समय पर रिपोर्ट किया गया (<24 घंटे)">Reported promptly (<24 hrs)</option>
+                <option value="discovered_late" data-en="Discovered fraud / transaction late" data-hi="धोखाधड़ी का पता देर से चला">Discovered fraud / transaction late</option>
+                <option value="bank_resolution" data-en="Attempted resolution with bank first" data-hi="पहले बैंक से समाधान का प्रयास किया">Attempted resolution with bank first</option>
+                <option value="threat_duress" data-en="Victim was under duress / extortion" data-hi="धमकी या जबरन वसूली के दबाव में थे">Victim was under duress / extortion</option>
+                <option value="evidence_prep" data-en="Gathering transaction proofs" data-hi="लेनदेन के सबूत जुटा रहे थे">Gathering transaction proofs</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Structured Suspect Metadata Chips -->
+          <div class="input-group">
+            <label data-en="Suspect Information (Optional)" data-hi="संदिग्ध की जानकारी (वैकल्पिक)">Suspect Information (Optional)</label>
+            <p class="field-hint" data-en="Add any known numbers, UPI IDs, or links used by the perpetrator:" data-hi="अपराधी द्वारा उपयोग किए गए नंबर, UPI ID या लिंक जोड़ें:">Add any known numbers, UPI IDs, or links used by the perpetrator:</p>
+            
+            <div class="suspect-chips-bar">
+              <button type="button" class="suspect-add-chip" onclick="toggleSuspectField('phone')">+ Add Suspect Phone</button>
+              <button type="button" class="suspect-add-chip" onclick="toggleSuspectField('bank')">+ Add Suspect UPI / Bank</button>
+              <button type="button" class="suspect-add-chip" onclick="toggleSuspectField('link')">+ Add Website / APK</button>
+            </div>
+
+            <div class="suspect-input-fields" id="suspect-fields-wrap" style="display:none;">
+              <div id="sf-phone-row" style="display:none;">
+                <label style="font-size:0.80rem; font-weight:700; color:var(--text-main); margin-bottom:4px; display:block;">Suspect Phone Number:</label>
+                <input type="text" id="suspect-phone" class="clean-input" placeholder="e.g. +91 9876543210">
+              </div>
+              <div id="sf-bank-row" style="display:none;">
+                <label style="font-size:0.80rem; font-weight:700; color:var(--text-main); margin-bottom:4px; display:block;">Suspect UPI ID / Bank Account & IFSC:</label>
+                <input type="text" id="suspect-bank" class="clean-input" placeholder="e.g. scammer@okhdfcbank or A/C 9182736192 / HDFC0001234">
+              </div>
+              <div id="sf-link-row" style="display:none;">
+                <label style="font-size:0.80rem; font-weight:700; color:var(--text-main); margin-bottom:4px; display:block;">Scam Website / APK / Social Media URL:</label>
+                <input type="text" id="suspect-link" class="clean-input" placeholder="e.g. https://reward-points-bonus.apk or @telegram_handle">
+              </div>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label data-en="Attach Evidence (Optional)" data-hi="सबूत संलग्न करें (वैकल्पिक)">Attach Evidence (Optional)</label>
+            <div class="clean-dropzone" onclick="triggerFileUpload()">
+              <input type="file" id="file-input" style="display:none;" multiple accept="image/*,.pdf" onchange="handleFileSelect(event)">
+              <strong data-en="Click to upload screenshots or PDF receipts" data-hi="स्क्रीनशॉट या रसीद अपलोड करने के लिए क्लिक करें">Click to upload screenshots or PDF receipts</strong>
+              <div style="font-size:0.78rem; margin-top:2px;">PNG, JPG, PDF up to 10MB</div>
+            </div>
+            <div class="file-chips-wrap" id="file-preview-grid"></div>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn btn-secondary" onclick="goToStep(1)">
+              <span data-en="Back" data-hi="वापस">Back</span>
+            </button>
+            <button class="btn btn-primary" onclick="goToStep(3)">
+              <span data-en="Continue" data-hi="जारी रखें">Continue</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="step-panel" id="panel-3">
+          <div id="anon-row" style="display:none; margin-bottom:18px; padding:12px; background:var(--card-subtle); border-radius:var(--radius-sm);">
+            <label style="display:flex; align-items:center; gap:8px; font-size:0.9rem; font-weight:600; cursor:pointer;">
+              <input type="checkbox" id="anon-check" onchange="toggleAnon(this.checked)">
+              <span data-en="Report completely anonymously (No name or phone required)" data-hi="पूरी तरह से गुमनाम रिपोर्ट करें (नाम या फोन की जरूरत नहीं)">Report completely anonymously (No name or phone required)</span>
+            </label>
+          </div>
+
+          <div id="identity-fields">
+            <div class="input-group">
+              <label data-en="Your Full Name" data-hi="आपका पूरा नाम">Your Full Name</label>
+              <input type="text" id="full-name" class="clean-input" placeholder="e.g. Rajesh Sharma">
+            </div>
+
+            <div class="input-group">
+              <label data-en="Mobile Number (for OTP verification & tracking)" data-hi="मोबाइल नंबर (OTP और ट्रैकिंग के लिए)">Mobile Number (for OTP verification & tracking)</label>
+              <input type="tel" id="mobile" class="clean-input" placeholder="10-digit mobile number" maxlength="10">
+              <button type="button" id="send-otp-btn" class="btn btn-secondary" onclick="sendOtp()" style="margin-top:8px; padding:7px 14px; font-size:0.82rem;">
+                <span data-en="Send 6-Digit OTP" data-hi="6-अंकीय OTP भेजें">Send 6-Digit OTP</span>
+              </button>
+            </div>
+
+            <div id="otp-group" style="display:none; margin-top:14px;">
+              <label data-en="Enter 6-Digit OTP" data-hi="6-अंकीय OTP दर्ज करें">Enter 6-Digit OTP</label>
+              <div class="otp-grid">
+                <input type="text" maxlength="1" class="otp-box" inputmode="numeric">
+                <input type="text" maxlength="1" class="otp-box" inputmode="numeric">
+                <input type="text" maxlength="1" class="otp-box" inputmode="numeric">
+                <input type="text" maxlength="1" class="otp-box" inputmode="numeric">
+                <input type="text" maxlength="1" class="otp-box" inputmode="numeric">
+                <input type="text" maxlength="1" class="otp-box" inputmode="numeric">
+              </div>
+              <button type="button" class="demo-chip" onclick="autoFillDemoOtp()">Use Demo OTP: 849201</button>
+            </div>
+          </div>
+
+          <!-- Location & Automatic Police Station Routing -->
+          <div class="location-box">
+            <div class="loc-detect-row">
+              <label style="font-weight:700; font-size:0.92rem;" data-en="Incident Location & Police Jurisdiction" data-hi="घटना का स्थान और पुलिस क्षेत्राधिकार">Incident Location & Police Jurisdiction</label>
+              <button type="button" class="loc-detect-btn" onclick="autoDetectLocation()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><circle cx="12" cy="12" r="10"/><polygon points="12 8 16 16 12 14 8 16 12 8"/></svg>
+                <span id="loc-detect-text" data-en="Auto-Detect My Location" data-hi="स्थान स्वतः पहचानें">Auto-Detect My Location</span>
+              </button>
+            </div>
+
+            <div class="location-select-grid">
+              <div>
+                <label style="font-size:0.80rem; color:var(--text-muted); font-weight:600;">State / UT:</label>
+                <select id="loc-state" class="clean-input" onchange="onStateChange(this.value)"></select>
+              </div>
+              <div>
+                <label style="font-size:0.80rem; color:var(--text-muted); font-weight:600;">District / City:</label>
+                <select id="loc-district" class="clean-input" onchange="onDistrictChange(this.value)"></select>
+              </div>
+            </div>
+
+            <div class="jurisdiction-badge" id="jurisdiction-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" style="flex:none; margin-top:2px;"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+              <div>
+                <strong style="display:block;">Designated Police Station:</strong>
+                <span id="jurisdiction-station-name">Cyber Crime Police Station, South District, Hauz Khas, New Delhi</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn btn-secondary" onclick="goToStep(2)">
+              <span data-en="Back" data-hi="वापस">Back</span>
+            </button>
+            <button class="btn btn-primary" onclick="goToStep(4)">
+              <span data-en="Review Summary" data-hi="समीक्षा सारांश">Review Summary</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 4: Interactive Pre-Submission Final Review -->
+        <div class="step-panel" id="panel-4">
+          <div style="margin-bottom:16px;">
+            <h3 style="font-size:1.15rem; margin-bottom:4px;" data-en="Final Review & Verification" data-hi="अंतिम समीक्षा और सत्यापन">Final Review & Verification</h3>
+            <p style="font-size:0.86rem; color:var(--text-muted);" data-en="Please confirm all details are accurate before official submission. Click Edit on any block to modify." data-hi="कृपया आधिकारिक सबमिशन से पहले सभी विवरणों की पुष्टि करें। संशोधन के लिए संपादित करें पर क्लिक करें।">Please confirm all details are accurate before official submission. Click Edit on any block to modify.</p>
+          </div>
+
+          <!-- Structured Review Container -->
+          <div class="review-container" id="review-blocks-container">
+            <!-- Populated dynamically by buildReview() -->
+          </div>
+
+          <!-- Statutory Declaration -->
+          <div class="declaration-box">
+            <input type="checkbox" id="declaration-check" checked style="margin-top:2px;">
+            <label for="declaration-check" style="cursor:pointer;" data-en="I solemnly affirm under Section 217 of BNS that the statements and digital evidence provided above are accurate and truthful." data-hi="मैं BNS की धारा 217 के तहत सत्यनिष्ठा से पुष्टि करता/करती हूं कि ऊपर दिए गए विवरण और डिजिटल साक्ष्य सही और सत्य हैं।">
+              I solemnly affirm under Section 217 of BNS that the statements and digital evidence provided above are accurate and truthful.
+            </label>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn btn-secondary" onclick="goToStep(3)">
+              <span data-en="Back to Details" data-hi="विवरण पर वापस जाएं">Back to Details</span>
+            </button>
+            <button class="btn btn-primary" id="submit-btn" onclick="submitReport()">
+              <span data-en="Submit Complaint & Generate Slip →" data-hi="शिकायत सबमिट करें और रसीद बनाएं →">Submit Complaint & Generate Slip →</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 5. CONFIRMATION SCREEN ==================== -->
+  <section class="screen" id="screen-confirmation">
+    <div class="wrap confirmation-wrap">
+      <div style="width:54px; height:54px; border-radius:50%; background:var(--success-bg); border:1px solid var(--success-border); color:var(--success); display:flex; align-items:center; justify-content:center; margin:0 auto 16px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="28" height="28"><path d="M20 6L9 17l-5-5"/></svg>
+      </div>
+      <h2 data-en="Report Successfully Filed & Dispatched" data-hi="रिपोर्ट सफलतापूर्वक दर्ज और भेजी गई">Report Successfully Filed & Dispatched</h2>
+      <p style="color:var(--text-muted); font-size:0.95rem; margin-top:6px;">Your national complaint acknowledgment has been generated and routed to the designated station.</p>
+
+      <!-- Official NCRP Printable / PDF Slip -->
+      <div class="ncrp-slip-card" id="ncrp-official-slip">
+        <div class="ncrp-slip-header">
+          <div>
+            <div style="font-size:0.72rem; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; color:#64748B;">Government of India · Ministry of Home Affairs</div>
+            <strong style="font-size:1.05rem; display:block; color:#0F172A; margin-top:2px;">National Cyber Crime Reporting Portal (NCRP 2.0)</strong>
+            <span style="font-size:0.78rem; color:#64748B;">Official Complaint Acknowledgment Slip (Sec 65B Evidence Act)</span>
+          </div>
+          <div style="text-align:right;">
+            <span style="font-size:0.72rem; font-weight:700; color:#64748B; text-transform:uppercase; display:block;">Reference Number</span>
+            <strong id="ref-number" style="font-family:var(--font-mono); font-size:1.15rem; color:#0F172A;">NCRP2026000000</strong>
+          </div>
+        </div>
+
+        <table class="ncrp-slip-table">
+          <tr>
+            <td class="label-col">Filing Timestamp:</td>
+            <td id="slip-timestamp">25 Aug 2026, 08:50 PM</td>
+          </tr>
+          <tr>
+            <td class="label-col">Crime Category:</td>
+            <td id="slip-category">Financial Cyber Fraud (Lost Money)</td>
+          </tr>
+          <tr>
+            <td class="label-col">Complainant:</td>
+            <td id="slip-complainant">Rajesh Sharma (Verified)</td>
+          </tr>
+          <tr>
+            <td class="label-col">Designated Station:</td>
+            <td id="slip-station">Cyber Crime Police Station, South District, Hauz Khas, New Delhi</td>
+          </tr>
+          <tr>
+            <td class="label-col">Suspect Identifiers:</td>
+            <td id="slip-suspect">Phone: +91 9876543210 · UPI: scammer@okhdfcbank</td>
+          </tr>
+          <tr>
+            <td class="label-col">Incident Narrative:</td>
+            <td id="slip-description" style="font-size:0.80rem; color:#475569;">Received phishing call claiming KYC suspension…</td>
+          </tr>
+        </table>
+
+        <div class="ncrp-slip-qr-box">
+          <!-- SVG QR Code Icon -->
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="1.8">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+            <rect x="6" y="6" width="1" height="1" fill="#0F172A"></rect>
+            <rect x="17" y="6" width="1" height="1" fill="#0F172A"></rect>
+            <rect x="6" y="17" width="1" height="1" fill="#0F172A"></rect>
+            <rect x="17" y="17" width="1" height="1" fill="#0F172A"></rect>
+          </svg>
+          <div style="font-size:0.78rem; color:#475569; line-height:1.4;">
+            <strong style="color:#0F172A; display:block;">Digital Verification Seal & QR Code</strong>
+            Scan at designated Cyber Crime Police Station for instant digital case dossier ingestion.
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <button class="btn btn-primary" onclick="downloadSlipPdf()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span data-en="Download PDF Receipt" data-hi="PDF रसीद डाउनलोड करें">Download PDF Receipt</span>
+          </button>
+          <button class="btn btn-secondary" onclick="window.print()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            <span data-en="Print Complaint Copy" data-hi="रसीद प्रिंट करें">Print Complaint Copy</span>
+          </button>
+        </div>
+
+        <!-- Financial Recovery Action (Only Shown for Financial Crimes) -->
+        <div id="conf-rbi-wrap">
+          <button class="btn btn-secondary btn-block" onclick="openRbiWithRef()" style="margin-top:4px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            <span data-en="Generate Official RBI Bank Dispute Letter" data-hi="आधिकारिक RBI बैंक विवाद पत्र बनाएं">Generate Official RBI Bank Dispute Letter</span>
+          </button>
+          <p style="font-size:0.78rem; color:var(--text-muted); margin-top:4px;" data-en="Statutory 3-day notice to legally mandate bank shadow credit under RBI circular." data-hi="RBI परिपत्र के तहत बैंक रिफंड अनिवार्य करने के लिए 3-दिवसीय वैधानिक नोटिस।">Statutory 3-day notice to legally mandate bank shadow credit under RBI circular.</p>
+        </div>
+
+        <button class="btn btn-secondary btn-block" onclick="showScreen('screen-track')">
+          <span data-en="Track Live Complaint Status →" data-hi="लाइव शिकायत स्थिति ट्रैक करें →">Track Live Complaint Status →</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 6. TRACK SCREEN ==================== -->
+  <section class="screen" id="screen-track">
+    <div class="wrap tool-wrap" style="max-width:560px; margin:0 auto;">
+      <button class="back-link" onclick="showScreen('screen-home')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        <span data-en="Back to Home" data-hi="होम पर वापस जाएं">Back to Home</span>
+      </button>
+
+      <h2 class="section-heading" data-en="Track Complaint Status" data-hi="शिकायत स्थिति ट्रैक करें">Track Complaint Status</h2>
+      <p class="section-sub" data-en="Enter the reference number provided upon submission:" data-hi="सबमिशन पर प्रदान की गई संदर्भ संख्या दर्ज करें:">Enter the reference number provided upon submission:</p>
+
+      <div class="form-card" style="margin-top:20px;">
+        <div class="input-group">
+          <label data-en="NCRP Reference Number" data-hi="NCRP संदर्भ संख्या">NCRP Reference Number</label>
+          <input type="text" id="track-ref" class="clean-input" placeholder="e.g. NCRP2026849201">
+        </div>
+        <button class="btn btn-primary btn-block" id="track-btn" onclick="trackComplaint()">
+          <span data-en="Check Status" data-hi="स्थिति जांचें">Check Status</span>
+        </button>
+        <div id="track-error" style="color:var(--emergency); font-size:0.85rem; margin-top:8px; display:none;"></div>
+        <div id="track-result" style="margin-top:20px; display:none;"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 7. SUSPECT CHECK SCREEN ==================== -->
+  <section class="screen" id="screen-suspect">
+    <div class="wrap tool-wrap" style="max-width:560px; margin:0 auto;">
+      <button class="back-link" onclick="showScreen('screen-home')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        <span data-en="Back to Home" data-hi="होम पर वापस जाएं">Back to Home</span>
+      </button>
+
+      <h2 class="section-heading" data-en="Check a Suspicious Phone or Link" data-hi="संदिग्ध फोन या लिंक जांचें">Check a Suspicious Phone or Link</h2>
+      <p class="section-sub" data-en="Cross-reference against reported numbers, UPI handles, and scam APKs:" data-hi="रिपोर्ट किए गए नंबरों, UPI हैंडल और धोखाधड़ी APK से मिलान करें:">Cross-reference against reported numbers, UPI handles, and scam APKs:</p>
+
+      <div class="form-card" style="margin-top:20px;">
+        <div class="input-group">
+          <label data-en="Phone, UPI ID, Email, or Link" data-hi="फोन, UPI ID, ईमेल या लिंक">Phone, UPI ID, Email, or Link</label>
+          <input type="text" id="suspect-input" class="clean-input" placeholder="e.g. +91 9876543210 or sbi-reward.apk">
+        </div>
+
+        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px;">
+          <span style="font-size:0.75rem; font-weight:700; color:var(--text-muted);">Try Samples:</span>
+          <button type="button" class="demo-chip" onclick="testSuspectQuery('+91 9876543210')">+91 9876543210</button>
+          <button type="button" class="demo-chip" onclick="testSuspectQuery('sbi-reward-points.apk')">sbi-reward.apk</button>
+          <button type="button" class="demo-chip" onclick="testSuspectQuery('+91 9123456789')">Clean Number Sample</button>
+        </div>
+
+        <button class="btn btn-primary btn-block" id="check-btn" onclick="checkSuspect()">
+          <span data-en="Scan Database" data-hi="डेटाबेस स्कैन करें">Scan Database</span>
+        </button>
+
+        <div id="suspect-result-box" style="margin-top:20px; display:none;"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 8. OFFICIALS QUEUE SCREEN ==================== -->
+  <section class="screen" id="screen-admin">
+    <div class="wrap tool-wrap">
+      <button class="back-link" onclick="showScreen('screen-home')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        <span data-en="Back to Home" data-hi="होम पर वापस जाएं">Back to Home</span>
+      </button>
+
+      <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:16px; flex-wrap:wrap; margin-bottom:20px;">
+        <div>
+          <h2 class="section-heading" data-en="Officials Intake & Triage Queue" data-hi="अधिकारियों का ट्राइएज डैशबोर्ड">Officials Intake & Triage Queue</h2>
+          <p class="section-sub" data-en="Demo view of how cases stream into state cyber cells in real time:" data-hi="राज्य साइबर सेल में मामले कैसे पहुंचते हैं इसका डेमो:">Demo view of how cases stream into state cyber cells in real time:</p>
+        </div>
+        <button class="btn btn-secondary" onclick="loadAdminQueue()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          <span>Refresh Queue</span>
+        </button>
+      </div>
+
+      <div style="background:var(--card); border:1px solid var(--border); border-radius:var(--radius-md); overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse; font-size:0.88rem; text-align:left;">
+          <thead>
+            <tr style="background:var(--card-subtle); border-bottom:1px solid var(--border);">
+              <th style="padding:12px 16px;">Reference</th>
+              <th style="padding:12px 16px;">Category</th>
+              <th style="padding:12px 16px;">Description</th>
+              <th style="padding:12px 16px;">Date</th>
+              <th style="padding:12px 16px;">Status</th>
+              <th style="padding:12px 16px;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="admin-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Simple Clean Footer -->
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <div>
+      CyberSuraksha — a concept redesign for a UI/UX competition. Not affiliated with or endorsed by the Government of India.
+    </div>
+    <div style="display:flex; gap:16px;">
+      <a href="#" onclick="showScreen('screen-home'); return false;">Home</a>
+      <a href="#" onclick="showScreen('screen-diagnostic'); return false;">Check a Scam</a>
+      <a href="#" onclick="showScreen('screen-learning'); return false;">Safety Tips</a>
+      <a href="#" onclick="showScreen('screen-admin'); loadAdminQueue(); return false;">Officials View (demo)</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Floating Voice Assistant -->
+<button class="voice-fab" id="speak-btn" onclick="toggleSpeak()" title="Read Page Aloud (Esc to Stop)">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+  <span id="speak-btn-text" data-en="Read Aloud" data-hi="पेज सुनें">Read Aloud</span>
+</button>
+
+<!-- Mobile Emergency Bar -->
+<div class="mobile-bar">
+  <div>
+    <strong style="font-size:0.9rem;">Cyber Emergency?</strong>
+    <span style="display:block; font-size:0.75rem; color:var(--text-muted);">Free national helpline</span>
+  </div>
+  <a href="tel:1930" class="call-1930-btn" style="padding:7px 14px; font-size:0.84rem;" aria-label="Call 1930 Helpline">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.4 2.1L8.1 9.7a16 16 0 0 0 6.2 6.2l1.2-1.2a2 2 0 0 1 2.1-.4c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2z"/></svg>
+    <span data-en="Call 1930" data-hi="कॉल 1930">Call 1930</span>
+  </a>
+</div>
+
+<!-- =========================================================
+     9. JAVASCRIPT LOGIC (ROBUST, ZERO DEPENDENCY)
+  ========================================================== -->
+<script>
+  var _memStore = { personal:{}, shared:{} };
+  /* Persistent storage: localStorage with in-memory fallback */
+  var _lsAvailable = (function(){ try { localStorage.setItem('__test__','1'); localStorage.removeItem('__test__'); return true; } catch(e){ return false; } })();
+  function _lsGet(key){ if(!_lsAvailable) return undefined; var v = localStorage.getItem('cs_' + key); return v !== null ? v : undefined; }
+  function _lsSet(key, val){ if(_lsAvailable) localStorage.setItem('cs_' + key, val); }
+  function _lsDel(key){ if(_lsAvailable) localStorage.removeItem('cs_' + key); }
+  function _lsKeys(prefix){ if(!_lsAvailable) return []; var out=[]; for(var i=0;i<localStorage.length;i++){ var k=localStorage.key(i); if(k && k.indexOf('cs_')===0){ var bare=k.slice(3); if(!prefix||bare.indexOf(prefix)===0) out.push(bare); } } return out; }
+  var storage = window.storage || {
+    get: function(key, shared){ return new Promise(function(res,rej){ var v = _lsGet(key); if(v!==undefined){ res({key:key,value:v,shared:!!shared}); } else { var s=shared?_memStore.shared:_memStore.personal; if(key in s) res({key:key,value:s[key],shared:!!shared}); else rej(new Error('not_found')); } }); },
+    set: function(key, value, shared){ return new Promise(function(res){ _lsSet(key, value); var s=shared?_memStore.shared:_memStore.personal; s[key]=value; res({key:key,value:value,shared:!!shared}); }); },
+    delete: function(key, shared){ return new Promise(function(res){ _lsDel(key); var s=shared?_memStore.shared:_memStore.personal; delete s[key]; res({key:key,deleted:true,shared:!!shared}); }); },
+    list: function(prefix, shared){ return new Promise(function(res){ var memKeys=Object.keys(shared?_memStore.shared:_memStore.personal).filter(function(k){return !prefix||k.indexOf(prefix)===0;}); var lKeys=_lsKeys(prefix); var all=memKeys.concat(lKeys).filter(function(v,i,a){return a.indexOf(v)===i;}); res({keys:all,prefix:prefix,shared:!!shared}); }); }
+  };
+  async function storageGet(key, shared){ try{ var r = await storage.get(key, !!shared); return r ? r.value : null; } catch(e){ return null; } }
+  async function storageSet(key, value, shared){ try{ return await storage.set(key, value, !!shared); } catch(e){ return null; } }
+
+  function isHindi(){ return document.getElementById('lang-hi').classList.contains('active'); }
+  function sanitizeKey(str){ return str.toLowerCase().trim().replace(/[^a-z0-9@._-]/g,'_').slice(0,80); }
+
+  function normalizeSuspectKey(str){
+    if(!str) return '';
+    var raw = str.trim().toLowerCase();
+    var digits = raw.replace(/\D/g, '');
+    if(digits.length === 10) return 'phone_' + digits;
+    if(digits.length === 12 && digits.indexOf('91') === 0) return 'phone_' + digits.slice(2);
+    if(digits.length === 11 && digits.indexOf('0') === 0) return 'phone_' + digits.slice(1);
+    return 'id_' + raw.replace(/[^a-z0-9@._-]/g, '_').slice(0, 80);
+  }
+
+  var _currentFontScale = 1.0;
+  function adjustFontScale(delta){
+    _currentFontScale = Math.min(Math.max(_currentFontScale + delta, 0.85), 1.25);
+    document.documentElement.style.setProperty('--fs-scale', _currentFontScale);
+    announceA11y((isHindi() ? 'फॉन्ट आकार: ' : 'Text size: ') + Math.round(_currentFontScale * 100) + '%');
+  }
+
+  function setLang(lang){
+    document.querySelectorAll('[data-en]').forEach(function(el){
+      var text = lang === 'hi' ? el.getAttribute('data-hi') : el.getAttribute('data-en');
+      if(text !== null) el.textContent = text;
+    });
+    document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+    document.getElementById('lang-hi').classList.toggle('active', lang === 'hi');
+    document.documentElement.lang = lang;
+    stopSpeaking();
+  }
+
+  function toggleContrast(){ 
+    document.documentElement.classList.toggle('high-contrast');
+    var isHigh = document.documentElement.classList.contains('high-contrast');
+    announceA11y(isHigh ? (isHindi() ? 'उच्च कंट्रास्ट मोड सक्षम' : 'High contrast mode enabled') : (isHindi() ? 'सामान्य मोड सक्षम' : 'Standard contrast mode enabled'));
+  }
+  function toggleMenu(){
+    var nav = document.getElementById('main-nav');
+    var button = document.querySelector('.mobile-menu-btn');
+    if(!nav) return;
+    var isOpen = nav.classList.toggle('open');
+    if(button) button.setAttribute('aria-expanded', String(isOpen));
+  }
+
+  function showScreen(id){
+    document.querySelectorAll('.screen').forEach(function(s){
+      s.classList.remove('active');
+      s.setAttribute('aria-hidden', 'true');
+    });
+    var target = document.getElementById(id);
+    if(target){
+      target.classList.add('active');
+      target.setAttribute('aria-hidden', 'false');
+    }
+    document.getElementById('main-nav').classList.remove('open');
+    var menuButton = document.querySelector('.mobile-menu-btn');
+    if(menuButton) menuButton.setAttribute('aria-expanded', 'false');
+    window.scrollTo({top: 0, behavior: 'smooth'});
+    
+    // Highlight matching navigation button
+    document.querySelectorAll('.header-nav .nav-btn').forEach(function(b){ b.classList.remove('current'); });
+    var navMap = {
+      'screen-home': 0,
+      'screen-diagnostic': 1,
+      'screen-learning': 2,
+      'screen-suspect': 3,
+      'screen-track': 4
+    };
+    if(navMap[id] !== undefined){
+      var btns = document.querySelectorAll('.header-nav .nav-btn');
+      if(btns[navMap[id]]) btns[navMap[id]].classList.add('current');
+    }
+
+    var heading = target ? target.querySelector('h1, h2') : null;
+    if(heading){
+      heading.setAttribute('tabindex', '-1');
+      heading.focus();
+      announceA11y((isHindi() ? 'पेज: ' : 'Screen: ') + heading.textContent);
+    }
+    stopSpeaking();
+  }
+
+  var flowState = { situation:'money', anon:false, otpSent:false, otpVerified:false, otpCode:'849201', files:[] };
+
+  var situationMeta = {
+    money: { titleEn:"Financial Cyber Fraud (Lost Money)", titleHi:"वित्तीय साइबर धोखाधड़ी (पैसा गंवाया)", anon:false },
+    harass: { titleEn:"Threats, Extortion or Blackmail", titleHi:"धमकी, जबरन वसूली या ब्लैकमेल", anon:true },
+    hack: { titleEn:"Hacked Account or Device", titleHi:"हैक किया गया अकाउंट या डिवाइस", anon:false },
+    check: { titleEn:"Checking Suspicious Activity", titleHi:"संदिग्ध गतिविधि की जांच", anon:false }
+  };
+
+  var statusFlow = ['received','assigned','investigating','resolved'];
+  var statusLabel = {
+    received:{en:'Report Received', hi:'रिपोर्ट प्राप्त हुई'},
+    assigned:{en:'Assigned to Cyber Cell', hi:'साइबर सेल को सौंपा गया'},
+    investigating:{en:'Under Active Investigation', hi:'जांच जारी है'},
+    resolved:{en:'Resolved', hi:'सुलझा लिया गया'}
+  };
+
+  /* =========================================================
+     JURISDICTION & LOCATION ENGINE
+  ========================================================== */
+  var jurisdictionDb = {
+    "Delhi": {
+      "South Delhi": "Cyber Crime Police Station, South District, Hauz Khas, New Delhi",
+      "Central Delhi": "Cyber Crime Police Station, Central District, Kamla Market, New Delhi",
+      "New Delhi (NDMC)": "Special Cell Cyber Command Hub, Mandir Marg, New Delhi",
+      "North Delhi": "Cyber Crime Police Station, North District, Maurice Nagar, Delhi",
+      "East Delhi": "Cyber Crime Police Station, East District, Preet Vihar, Delhi",
+      "West Delhi": "Cyber Crime Police Station, West District, Rajouri Garden, Delhi"
+    },
+    "Karnataka": {
+      "Bengaluru Urban": "Cyber Crime Police Station (CID Karnataka), Infantry Road, Bengaluru",
+      "Bengaluru Rural": "District Cyber Cell, Bengaluru Rural Police HQ",
+      "Mysuru": "City Cyber Crime Police Station, Mysuru City Commissionerate",
+      "Mangaluru": "Cyber Economic & Narcotics (CEN) Police Station, Mangaluru",
+      "Hubballi-Dharwad": "CEN Police Station, Hubballi City"
+    },
+    "Maharashtra": {
+      "Mumbai Suburban": "Cyber Crime Police Station, BKC Cyber Complex, Bandra (E), Mumbai",
+      "Mumbai City": "South Region Cyber Police Station, Worli, Mumbai",
+      "Pune": "Cyber Police Station, Shivaji Nagar, Pune City Commissionerate",
+      "Thane": "District Cyber Cell, Thane Police Commissionerate",
+      "Nagpur": "Cyber Crime Police Station, Civil Lines, Nagpur"
+    },
+    "Tamil Nadu": {
+      "Chennai": "Cyber Crime Police Station, Greater Chennai Police HQ, Vepery",
+      "Coimbatore": "City Cyber Cell, Coimbatore City Police",
+      "Madurai": "Cyber Crime Police Station, Madurai City",
+      "Kanchipuram": "District Cyber Cell, Kanchipuram"
+    },
+    "Telangana": {
+      "Hyderabad": "TGCSB Cyber Security Bureau HQ / Cyber Police Station, Basheerbagh",
+      "Cyberabad": "Cyber Crime Police Station, Cyberabad Commissionerate, Gachibowli",
+      "Rachakonda": "Cyber Cell, Rachakonda Police Commissionerate, Neredmet"
+    },
+    "Uttar Pradesh": {
+      "Noida / Gautam Buddha Nagar": "Cyber Crime Police Station, Sector 36, Noida",
+      "Lucknow": "UP Cyber Police Headquarters & Cyber Cell, Signature Building, Lucknow",
+      "Kanpur": "Cyber Crime Police Station, Kanpur Nagar Commissionerate",
+      "Varanasi": "Cyber Police Station, Sigra, Varanasi"
+    },
+    "Gujarat": {
+      "Ahmedabad": "Cyber Crime Police Station, Mithakhali, Ahmedabad City",
+      "Surat": "Cyber Crime Police Station, Athwalines, Surat",
+      "Vadodara": "Cyber Cell, Vadodara City Police Commissionerate"
+    },
+    "West Bengal": {
+      "Kolkata": "Cyber Crime Police Station, Lalbazar, Kolkata Police HQ",
+      "Salt Lake / Bidhannagar": "Bidhannagar Cyber Crime Police Station, Salt Lake",
+      "Howrah": "Cyber Crime Police Station, Howrah City Police"
+    },
+    "Rajasthan": {
+      "Jaipur": "Cyber Crime Police Station, Jaipur Police Commissionerate, Ghatgate",
+      "Jodhpur": "Cyber Cell, Jodhpur City Commissionerate",
+      "Kota": "District Cyber Police Station, Kota"
+    },
+    "Kerala": {
+      "Thiruvananthapuram": "Hi-Tech Cyber Crime Police Station, Police HQ, Vazhuthacaud",
+      "Kochi / Ernakulam": "Cyber Crime Police Station, Ernakulam City",
+      "Kozhikode": "Cyber Cell, Kozhikode City"
+    }
+  };
+
+  function initLocationSelectors(){
+    var stateSel = document.getElementById('loc-state');
+    var distSel = document.getElementById('loc-district');
+    if(!stateSel || !distSel) return;
+    
+    stateSel.innerHTML = '';
+    Object.keys(jurisdictionDb).forEach(function(s){
+      var opt = document.createElement('option');
+      opt.value = s; opt.textContent = s;
+      stateSel.appendChild(opt);
+    });
+    onStateChange(stateSel.value);
+  }
+
+  function onStateChange(state){
+    var distSel = document.getElementById('loc-district');
+    if(!distSel) return;
+    distSel.innerHTML = '';
+    var districts = Object.keys(jurisdictionDb[state] || {});
+    districts.forEach(function(d){
+      var opt = document.createElement('option');
+      opt.value = d; opt.textContent = d;
+      distSel.appendChild(opt);
+    });
+    onDistrictChange(distSel.value);
+  }
+
+  function onDistrictChange(dist){
+    var state = document.getElementById('loc-state').value;
+    var station = (jurisdictionDb[state] && jurisdictionDb[state][dist]) ? jurisdictionDb[state][dist] : ("Cyber Crime Police Station, " + dist + ", " + state);
+    var badge = document.getElementById('jurisdiction-station-name');
+    if(badge) badge.textContent = station;
+  }
+
+  function autoDetectLocation(){
+    var btnText = document.getElementById('loc-detect-text');
+    var isHi = isHindi();
+    if(btnText) btnText.textContent = isHi ? 'स्थान खोजा जा रहा है…' : 'Detecting GPS…';
+    
+    setTimeout(function(){
+      // Simulated accurate geo-detection for demo
+      var stateSel = document.getElementById('loc-state');
+      var distSel = document.getElementById('loc-district');
+      if(stateSel && distSel){
+        stateSel.value = "Delhi";
+        onStateChange("Delhi");
+        distSel.value = "South Delhi";
+        onDistrictChange("South Delhi");
+      }
+      if(btnText) btnText.textContent = isHi ? '✓ स्थान पहचाना गया (South Delhi)' : '✓ Detected: South Delhi, Delhi';
+    }, 450);
+  }
+
+  /* Suspect Metadata Expandable Chips */
+  function toggleSuspectField(type, forceShow){
+    var wrap = document.getElementById('suspect-fields-wrap');
+    if(wrap) wrap.style.display = 'flex';
+    var row = document.getElementById('sf-' + type + '-row');
+    if(row){
+      if(forceShow === true){
+        row.style.display = 'block';
+      } else {
+        row.style.display = (row.style.display === 'none' || !row.style.display) ? 'block' : 'none';
+      }
+      var inp = row.querySelector('input');
+      if(inp && row.style.display === 'block') inp.focus();
+    }
+  }
+
+  /* =========================================================
+     AI SMART VOICE & TEXT COMPLAINT INTAKE ENGINE
+  ========================================================== */
+  var _lastExtractedData = null;
+  var _speechRec = null;
+  var _isRecording = false;
+
+  var judgeScenarios = {
+    electricity: {
+      text: "Received an urgent SMS: 'Dear Customer, your electricity power will be disconnected tonight at 9:30 PM due to unpaid bill of ₹48,500. Call electricity officer at +91 9876543210 immediately.' When I called, he asked me to install QuickSupport and send ₹10. Suddenly ₹48,500 was debited from my SBI account to UPI ID pay-fraud@okhdfcbank.",
+      cat: "money"
+    },
+    sextortion: {
+      text: "Received an unsolicited Instagram video call from @priya_verma_99. The caller recorded screen and morphed explicit footage with my face. Now extorting ₹50,000 on WhatsApp +91 9771122334, threatening to leak the video to my family and Instagram followers.",
+      cat: "harass"
+    },
+    apk_loan: {
+      text: "Downloaded an instant loan app called 'QuickCash-Instant-50k.apk' from link http://loan-approval-fast.online. The app took permissions for contacts and photos, and now loan recovery agents from +91 9822334455 are threatening my contacts and sending abusive messages.",
+      cat: "hack"
+    },
+    aadhaar_sim: {
+      text: "My mobile network suddenly stopped working. When I visited the telecom store, they informed me that a duplicate SIM was issued using my leaked Aadhaar card and PAN details without my consent. Suspect mobile number operating the rogue SIM is +91 9911223344.",
+      cat: "hack"
+    }
+  };
+
+  function loadJudgeScenario(key){
+    var sc = judgeScenarios[key];
+    if(!sc) return;
+    var txt = document.getElementById('ai-intake-text');
+    if(txt){
+      txt.value = sc.text;
+      onAiIntakeInput();
+    }
+  }
+
+  function extractEntitiesAndIntent(text){
+    if(!text || !text.trim()) return null;
+    
+    // 1. Category Detection
+    var category = 'money';
+    var catTitleEn = 'Financial Cyber Fraud (Lost Money)';
+    var catTitleHi = 'वित्तीय साइबर फ्रॉड (पैसा गया)';
+    var urgency = '⚡ High Urgency · Golden Hour Active';
+    
+    if(/morphed|sextortion|blackmail|threat|instagram.*video|nude|leak.*photo|extort/i.test(text)){
+      category = 'harass';
+      catTitleEn = 'Online Blackmail & Extortion (Harassment)';
+      catTitleHi = 'ऑनलाइन ब्लैकमेल व धमकी';
+      urgency = '🛡️ High Sensitivity · Anonymous Protection Active';
+    } else if(/hack|compromised|whatsapp.*otp|apk|malware|loan.*app|sim.*swap|remote.*access|anydesk|teamviewer/i.test(text)){
+      category = 'hack';
+      catTitleEn = 'Hacked Account or Device Malware';
+      catTitleHi = 'हैक अकाउंट या डिवाइस मैलवेयर';
+      urgency = '🔒 Device/Account Compromise · Triage Active';
+    } else if(/aadhaar|pan.*card|identity.*theft|fake.*sim|leak.*data/i.test(text)){
+      category = 'hack';
+      catTitleEn = 'Identity Theft & Data Leak';
+      catTitleHi = 'पहचान की चोरी और डेटा लीक';
+      urgency = '🪪 Identity Theft · Prevention Active';
+    } else if(/money|rupees|rs\.?|inr|₹|deduct|debit|transferred|lost|gpay|phonepe|paytm|bank|sbi|hdfc|icici|upi|fraud|scam/i.test(text)){
+      category = 'money';
+      catTitleEn = 'Financial Cyber Fraud (Lost Money)';
+      catTitleHi = 'वित्तीय साइबर फ्रॉड (पैसा गया)';
+      urgency = '⚡ High Urgency · Golden Hour Active';
+    }
+    
+    // 2. Extract Phone Numbers
+    var phones = [];
+    var phoneMatches = text.match(/(?:\+91[\s-]?)?[6789]\d{9}\b/g) || [];
+    phoneMatches.forEach(function(p){
+      var clean = p.replace(/\D/g,'');
+      if(clean.length === 10 || (clean.length === 12 && clean.indexOf('91')===0)){
+        phones.push(p.trim());
+      }
+    });
+    
+    // 3. Extract Amounts
+    var amounts = [];
+    var amtMatch = text.match(/(?:rs\.?|inr|₹|\bINR\b)\s*([0-9,]+(?:\.\d{2})?)/i) || 
+                   text.match(/([0-9,]+)\s*(?:rupees|rs|bucks|inr)/i) ||
+                   text.match(/(?:debited|deducted|transferred|lost|paid)\s*(?:of\s*)?(?:rs\.?|inr|₹)?\s*([0-9,]+)/i);
+    if(amtMatch && amtMatch[1]){
+      amounts.push('₹' + amtMatch[1].replace(/,/g, ''));
+    }
+    
+    // 4. Extract UPI Handles
+    var upis = [];
+    var upiMatches = text.match(/\b[\w.\-]{2,}@(okhdfcbank|okaxis|oksbi|okicici|upi|paytm|ybl|ibl|axl|apl|barodampay|federal)\b/gi) || [];
+    upiMatches.forEach(function(u){ upis.push(u.trim()); });
+    
+    // 5. Extract URLs & APK links
+    var links = [];
+    var linkMatches = text.match(/https?:\/\/[^\s]+|[a-zA-Z0-9.\-]+\.(?:apk|online|site|top|xyz|club|link|vip|info)[^\s]*/gi) || [];
+    linkMatches.forEach(function(l){ links.push(l.trim()); });
+    
+    // 6. Extract Bank / Platform Names
+    var banks = [];
+    var bankKeywords = ['SBI', 'HDFC', 'ICICI', 'Axis Bank', 'PNB', 'Bank of Baroda', 'Canara Bank', 'Union Bank', 'Kotak', 'Paytm Bank', 'GPay', 'PhonePe', 'Instagram', 'WhatsApp', 'Telegram'];
+    bankKeywords.forEach(function(b){
+      var re = new RegExp('\\b' + b + '\\b', 'i');
+      if(re.test(text) && banks.indexOf(b) === -1){
+        banks.push(b);
+      }
+    });
+    
+    return {
+      category: category,
+      catTitleEn: catTitleEn,
+      catTitleHi: catTitleHi,
+      urgency: urgency,
+      phones: Array.from(new Set(phones)),
+      amounts: Array.from(new Set(amounts)),
+      upis: Array.from(new Set(upis)),
+      links: Array.from(new Set(links)),
+      banks: Array.from(new Set(banks)),
+      rawText: text
+    };
+  }
+
+  function onAiIntakeInput(){
+    var text = document.getElementById('ai-intake-text').value;
+    var extCard = document.getElementById('ai-extraction-card');
+    var isHi = isHindi();
+    
+    if(!text || text.trim().length < 8){
+      if(extCard) extCard.style.display = 'none';
+      _lastExtractedData = null;
+      return;
+    }
+    
+    var data = extractEntitiesAndIntent(text);
+    _lastExtractedData = data;
+    if(!data || !extCard) return;
+    
+    document.getElementById('ai-detected-cat-title').textContent = (isHi ? 'पहचाना गया: ' : 'Detected: ') + (isHi ? data.catTitleHi : data.catTitleEn);
+    document.getElementById('ai-detected-urgency').textContent = data.urgency;
+    
+    var grid = document.getElementById('ai-ext-entities-grid');
+    grid.innerHTML = '';
+    
+    data.amounts.forEach(function(a){
+      grid.innerHTML += '<span class="entity-chip">💰 <strong>Amount:</strong> ' + a + '</span>';
+    });
+    data.phones.forEach(function(p){
+      grid.innerHTML += '<span class="entity-chip">📞 <strong>Phone:</strong> ' + p + '</span>';
+    });
+    data.upis.forEach(function(u){
+      grid.innerHTML += '<span class="entity-chip">💳 <strong>UPI:</strong> ' + u + '</span>';
+    });
+    data.links.forEach(function(l){
+      grid.innerHTML += '<span class="entity-chip">🔗 <strong>Link:</strong> ' + l + '</span>';
+    });
+    data.banks.forEach(function(b){
+      grid.innerHTML += '<span class="entity-chip">🏦 <strong>Entity:</strong> ' + b + '</span>';
+    });
+    
+    if(!grid.innerHTML){
+      grid.innerHTML = '<span style="font-size:0.80rem; color:var(--text-muted);">' + (isHi ? 'विवरण से स्वचालित रूप से श्रेणी पहचानी गई' : 'Category automatically classified from narrative') + '</span>';
+    }
+    
+    extCard.style.display = 'block';
+  }
+
+  function analyzeAndRouteIntake(){
+    var text = document.getElementById('ai-intake-text').value.trim();
+    if(!text || text.length < 5){
+      alert(isHindi() ? 'कृपया अपनी शिकायत लिखें या बोलकर बताएं।' : 'Please type or speak your complaint first.');
+      document.getElementById('ai-intake-text').focus();
+      return;
+    }
+    if(!_lastExtractedData){
+      _lastExtractedData = extractEntitiesAndIntent(text);
+    }
+    applyAiAndProceed();
+  }
+
+  function applyAiAndProceed(){
+    if(!_lastExtractedData){
+      var text = document.getElementById('ai-intake-text').value.trim();
+      _lastExtractedData = extractEntitiesAndIntent(text || 'Financial Fraud incident');
+    }
+    var data = _lastExtractedData;
+    
+    flowState.situation = data.category;
+    document.getElementById('situation-select').value = data.category;
+    applySituation(data.category);
+    
+    // Pre-fill incident description
+    var descEl = document.getElementById('description');
+    if(descEl){
+      descEl.value = data.rawText;
+      updateCharCount();
+    }
+    
+    // Pre-fill suspect entities
+    if(data.phones.length){
+      var pEl = document.getElementById('suspect-phone');
+      if(pEl) pEl.value = data.phones[0];
+      toggleSuspectField('phone', true);
+    }
+    if(data.upis.length || data.banks.length){
+      var bEl = document.getElementById('suspect-bank');
+      if(bEl) bEl.value = data.upis.length ? data.upis[0] : data.banks.join(', ');
+      toggleSuspectField('bank', true);
+    }
+    if(data.links.length){
+      var lEl = document.getElementById('suspect-link');
+      if(lEl) lEl.value = data.links[0];
+      toggleSuspectField('link', true);
+    }
+    
+    goToStep(2);
+    showScreen('screen-flow');
+    announceA11y(isHindi() ? 'कदम 2: घटना का विवरण AI द्वारा स्वतः भरा गया' : 'Step 2: Incident details auto-filled by AI');
+  }
+
+  /* Voice Intake Functions */
+  function initVoiceRecognition(){
+    var SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if(!SpeechRec) return null;
+    var rec = new SpeechRec();
+    rec.continuous = true;
+    rec.interimResults = true;
+    rec.lang = isHindi() ? 'hi-IN' : 'en-IN';
+    
+    rec.onresult = function(e){
+      var transcript = '';
+      for(var i = e.resultIndex; i < e.results.length; ++i){
+        transcript += e.results[i][0].transcript;
+      }
+      var textarea = document.getElementById('ai-intake-text');
+      if(textarea && transcript){
+        textarea.value = transcript;
+        onAiIntakeInput();
+      }
+    };
+    
+    rec.onerror = function(e){
+      console.warn('Speech recognition error:', e.error);
+      stopVoiceIntake();
+    };
+    
+    rec.onend = function(){
+      if(_isRecording) stopVoiceIntake();
+    };
+    
+    return rec;
+  }
+
+  function toggleVoiceIntake(){
+    if(_isRecording){
+      stopVoiceIntake();
+    } else {
+      startVoiceIntake();
+    }
+  }
+
+  function startVoiceIntake(){
+    var SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if(!SpeechRec){
+      alert(isHindi() ? 'आपका ब्राउज़र वॉयस इनपुट का समर्थन नहीं करता है। कृपया टेक्स्ट टाइप करें।' : 'Speech recognition is not supported in this browser. Please type your complaint.');
+      return;
+    }
+    if(!_speechRec) _speechRec = initVoiceRecognition();
+    if(!_speechRec) return;
+    
+    _speechRec.lang = isHindi() ? 'hi-IN' : 'en-IN';
+    try {
+      _speechRec.start();
+      _isRecording = true;
+      var bar = document.getElementById('ai-recording-bar');
+      if(bar) bar.style.display = 'flex';
+      var btn = document.getElementById('ai-voice-btn');
+      if(btn) btn.classList.add('recording');
+      var txt = document.getElementById('voice-btn-text');
+      if(txt) txt.textContent = isHindi() ? 'रिकॉर्डिंग रोकें' : 'Stop Speaking';
+      announceA11y(isHindi() ? 'वॉयस रिकॉर्डिंग चालू है' : 'Voice recording started');
+    } catch(err){
+      console.warn('Speech start error:', err);
+    }
+  }
+
+  function stopVoiceIntake(){
+    _isRecording = false;
+    if(_speechRec){
+      try { _speechRec.stop(); } catch(e){}
+    }
+    var bar = document.getElementById('ai-recording-bar');
+    if(bar) bar.style.display = 'none';
+    var btn = document.getElementById('ai-voice-btn');
+    if(btn) btn.classList.remove('recording');
+    var txt = document.getElementById('voice-btn-text');
+    if(txt) txt.textContent = isHindi() ? 'बोलकर बताएं' : 'Speak Complaint';
+    announceA11y(isHindi() ? 'वॉयस रिकॉर्डिंग बंद' : 'Voice recording stopped');
+  }
+
+  function startFlow(situation){
+    if(situation === 'check'){ showScreen('screen-suspect'); return; }
+    flowState.situation = situation;
+    document.getElementById('situation-select').value = situation;
+    applySituation(situation);
+    goToStep(2); // Instantly advance to Step 2 (Incident Details), eliminating redundant confirmation click
+    showScreen('screen-flow');
+  }
+
+  function onSituationChange(val){
+    flowState.situation = val;
+    applySituation(val);
+  }
+
+  function applySituation(situation){
+    var meta = situationMeta[situation];
+    var lang = isHindi() ? 'hi' : 'en';
+    document.getElementById('fh-title').textContent = lang === 'hi' ? meta.titleHi : meta.titleEn;
+    document.getElementById('anon-row').style.display = meta.anon ? 'block' : 'none';
+    if(!meta.anon){ document.getElementById('anon-check').checked = false; toggleAnon(false); }
+  }
+
+  function toggleAnon(checked){
+    flowState.anon = checked;
+    document.getElementById('identity-fields').style.display = checked ? 'none' : 'block';
+  }
+
+  function updateCharCount(){
+    var val = document.getElementById('description').value;
+    document.getElementById('char-count').textContent = val.length + (isHindi() ? ' अक्षर' : ' characters');
+  }
+
+  /* QW3: Step validation — prevents blank submissions from bypassing required fields */
+  function validateStep(fromStep, toStep){
+    var isHi = isHindi();
+    /* Only validate when moving forward */
+    if(toStep <= fromStep) return true;
+
+    /* Step 2 → 3: Require incident description */
+    if(fromStep === 2){
+      var desc = document.getElementById('description').value.trim();
+      if(!desc || desc.length < 10){
+        alert(isHi ? 'कृपया कम से कम 10 अक्षरों में घटना का विवरण लिखें।' : 'Please describe the incident in at least 10 characters.');
+        document.getElementById('description').focus();
+        return false;
+      }
+    }
+
+    /* Step 3 → 4: Require identity or explicit anonymous toggle + OTP */
+    if(fromStep === 3){
+      if(!flowState.anon){
+        var name = document.getElementById('full-name').value.trim();
+        var mobile = document.getElementById('mobile').value.trim();
+        if(!name){
+          alert(isHi ? 'कृपया अपना पूरा नाम दर्ज करें, या गुमनाम रिपोर्ट चुनें।' : 'Please enter your full name, or choose anonymous reporting.');
+          document.getElementById('full-name').focus();
+          return false;
+        }
+        if(!mobile || !/^\d{10}$/.test(mobile)){
+          alert(isHi ? 'कृपया 10 अंकों का मोबाइल नंबर दर्ज करें।' : 'Please enter a valid 10-digit mobile number.');
+          document.getElementById('mobile').focus();
+          return false;
+        }
+        if(!flowState.otpVerified){
+          alert(isHi ? 'कृपया पहले OTP सत्यापित करें।' : 'Please verify your OTP before continuing.');
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  function goToStep(n){
+    /* Determine current step for validation */
+    var currentPanel = document.querySelector('.step-panel.active');
+    var currentStep = currentPanel ? parseInt(currentPanel.id.replace('panel-','')) : 1;
+
+    /* Validate before moving forward */
+    if(n > currentStep && !validateStep(currentStep, n)) return;
+
+    document.querySelectorAll('.step-panel').forEach(function(p){ p.classList.remove('active'); });
+    var targetPanel = document.getElementById('panel-'+n);
+    if(targetPanel) targetPanel.classList.add('active');
+
+    /* QW6: Fix stepper track fill calculation to prevent overshoot at step 4.
+       The stepper-line uses left:20px right:20px, so 100% fill overshoots by 20px.
+       We clamp the fill to account for this offset geometry. */
+    var pct = Math.min(((n - 1) / 3) * 100, 100);
+    var trackFill = document.getElementById('stepper-track-fill');
+    if(trackFill) trackFill.style.width = pct + '%';
+
+    document.querySelectorAll('.step-node').forEach(function(item){
+      var step = parseInt(item.getAttribute('data-step'));
+      item.classList.remove('active','completed');
+      if(step < n) item.classList.add('completed');
+      else if(step === n) item.classList.add('active');
+    });
+
+    if(n === 4) buildReview();
+    window.scrollTo({top: 100, behavior:'smooth'});
+  }
+
+  /* Pre-Submission Final Review Builder */
+  function buildReview(){
+    var isHi = isHindi();
+    var meta = situationMeta[flowState.situation];
+    var desc = document.getElementById('description').value || (isHi ? '(विवरण दर्ज नहीं किया गया)' : '(No description provided)');
+    var date = document.getElementById('incident-date').value || (isHi ? 'आज की तारीख' : 'Today / Recent');
+    var delay = document.getElementById('delay-reason').options[document.getElementById('delay-reason').selectedIndex].text;
+    var sPhone = document.getElementById('suspect-phone') ? document.getElementById('suspect-phone').value.trim() : '';
+    var sBank = document.getElementById('suspect-bank') ? document.getElementById('suspect-bank').value.trim() : '';
+    var sLink = document.getElementById('suspect-link') ? document.getElementById('suspect-link').value.trim() : '';
+    var state = document.getElementById('loc-state').value;
+    var dist = document.getElementById('loc-district').value;
+    var station = document.getElementById('jurisdiction-station-name').textContent;
+    var name = flowState.anon ? (isHi ? 'गुमनाम नागरिक (पहचान सुरक्षित)' : 'Anonymous Citizen (Identity Protected)') : (document.getElementById('full-name').value || (isHi ? 'दर्ज नहीं' : 'Not provided'));
+    var mobile = flowState.anon ? '—' : (document.getElementById('mobile').value || (isHi ? 'दर्ज नहीं' : 'Not provided'));
+    
+    var container = document.getElementById('review-blocks-container');
+    if(!container) return;
+
+    var suspectsText = [];
+    if(sPhone) suspectsText.push('Phone: ' + sPhone);
+    if(sBank) suspectsText.push('UPI/Bank: ' + sBank);
+    if(sLink) suspectsText.push('Link: ' + sLink);
+    var suspectSummary = suspectsText.length ? suspectsText.join(' · ') : (isHi ? 'विवरण में उल्लिखित (ऑटो-एक्सट्रैक्ट)' : 'Mentioned in narrative (Auto-extracted)');
+
+    var filesSummary = flowState.files.length ? (flowState.files.length + (isHi ? ' फाइल(ें) संलग्न: ' : ' file(s) attached: ') + flowState.files.map(function(f){ return f.name; }).join(', ')) : (isHi ? 'कोई फाइल संलग्न नहीं' : 'No files attached');
+
+    var blocks = [
+      {
+        title: isHi ? '1. शिकायत श्रेणी' : '1. Crime Category',
+        step: 1,
+        content: '<strong>' + (isHi ? meta.titleHi : meta.titleEn) + '</strong>'
+      },
+      {
+        title: isHi ? '2. घटना का विवरण एवं समय' : '2. Incident Narrative & Timeline',
+        step: 2,
+        content: '<div><strong>' + (isHi ? 'तारीख: ' : 'Date: ') + '</strong>' + date + ' (' + delay + ')</div><div style="margin-top:4px; color:var(--text-muted);">' + (desc.length > 140 ? desc.slice(0,140)+'…' : desc) + '</div>'
+      },
+      {
+        title: isHi ? '3. संदिग्ध की जानकारी' : '3. Suspect Telemetry',
+        step: 2,
+        content: '<span style="color:var(--emergency-text); font-weight:600;">' + suspectSummary + '</span>'
+      },
+      {
+        title: isHi ? '4. स्थान एवं संबंधित पुलिस स्टेशन' : '4. Location & Mapped Police Station',
+        step: 3,
+        content: '<div><strong>' + dist + ', ' + state + '</strong></div><div style="font-size:0.82rem; color:#1E3A8A; margin-top:2px;">' + station + '</div>'
+      },
+      {
+        title: isHi ? '5. संलग्न साक्ष्य / सबूत' : '5. Supporting Evidence',
+        step: 2,
+        content: '<span style="font-size:0.84rem; color:var(--text-muted);">' + filesSummary + '</span>'
+      },
+      {
+        title: isHi ? '6. शिकायतकर्ता की पहचान' : '6. Complainant Details',
+        step: 3,
+        content: '<div><strong>' + name + '</strong>' + (flowState.anon ? '' : ' (' + mobile + ')') + '</div>'
+      }
+    ];
+
+    container.innerHTML = '';
+    blocks.forEach(function(b){
+      var div = document.createElement('div');
+      div.className = 'review-block';
+      div.innerHTML = '<div class="review-block-header">' +
+        '<span class="review-block-title">' + b.title + '</span>' +
+        '<button type="button" class="review-edit-btn" onclick="goToStep(' + b.step + ')">' + (isHi ? 'संपादित करें' : 'Edit') + '</button>' +
+        '</div>' +
+        '<div class="review-block-content">' + b.content + '</div>';
+      container.appendChild(div);
+    });
+  }
+
+  /* OTP & Files */
+  function triggerFileUpload(){ document.getElementById('file-input').click(); }
+  function handleFileSelect(e){
+    var files = Array.from(e.target.files || (e.dataTransfer && e.dataTransfer.files) || []);
+    files.forEach(function(f){
+      flowState.files.push({ name: f.name, size: Math.round(f.size/1024) + ' KB' });
+    });
+    renderFiles();
+  }
+  function renderFiles(){
+    var grid = document.getElementById('file-preview-grid');
+    grid.innerHTML = '';
+    flowState.files.forEach(function(f, idx){
+      var chip = document.createElement('div');
+      chip.className = 'f-chip';
+      chip.innerHTML = '<span>' + f.name + '</span><button type="button" onclick="removeFile(' + idx + ')">×</button>';
+      grid.appendChild(chip);
+    });
+  }
+  function removeFile(idx){
+    flowState.files.splice(idx, 1);
+    renderFiles();
+  }
+
+  /* Native Drag-and-Drop for Dropzone */
+  (function initDropzoneEvents(){
+    var dz = document.querySelector('.clean-dropzone');
+    if(!dz) return;
+    ['dragenter', 'dragover'].forEach(function(evt){
+      dz.addEventListener(evt, function(e){
+        e.preventDefault(); e.stopPropagation();
+        dz.style.borderColor = 'var(--text-main)';
+        dz.style.background = 'var(--card)';
+      });
+    });
+    ['dragleave', 'drop'].forEach(function(evt){
+      dz.addEventListener(evt, function(e){
+        e.preventDefault(); e.stopPropagation();
+        dz.style.borderColor = 'var(--border)';
+        dz.style.background = 'var(--card-subtle)';
+      });
+    });
+    dz.addEventListener('drop', function(e){
+      e.preventDefault(); e.stopPropagation();
+      if(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length){
+        handleFileSelect({ target: { files: e.dataTransfer.files } });
+      }
+    });
+  })();
+
+  var _otpTimer = null;
+  function sendOtp(){
+    var mob = document.getElementById('mobile').value.trim();
+    var isHi = isHindi();
+    if(mob.length < 10){ alert(isHi ? 'कृपया वैध 10-अंकीय मोबाइल नंबर दर्ज करें।' : 'Please enter a valid 10-digit mobile number.'); return; }
+    document.getElementById('otp-group').style.display = 'block';
+    flowState.otpSent = true;
+    initOtpBoxes();
+
+    var btn = document.getElementById('send-otp-btn');
+    if(btn){
+      btn.disabled = true;
+      var count = 30;
+      if(_otpTimer) clearInterval(_otpTimer);
+      btn.textContent = (isHi ? 'पुनः भेजें (' : 'Resend in ') + count + 's';
+      _otpTimer = setInterval(function(){
+        count--;
+        if(count <= 0){
+          clearInterval(_otpTimer);
+          btn.disabled = false;
+          btn.textContent = isHi ? 'OTP पुनः भेजें' : 'Resend OTP';
+        } else {
+          btn.textContent = (isHi ? 'पुनः भेजें (' : 'Resend in ') + count + 's';
+        }
+      }, 1000);
+    }
+  }
+
+  function initOtpBoxes(){
+    var boxes = document.querySelectorAll('.otp-box');
+    boxes.forEach(function(box, idx){
+      box.addEventListener('input', function(e){
+        if(box.value && idx < boxes.length - 1) boxes[idx+1].focus();
+      });
+      box.addEventListener('keydown', function(e){
+        if(e.key === 'Backspace' && !box.value && idx > 0) boxes[idx-1].focus();
+      });
+    });
+  }
+
+  function autoFillDemoOtp(){
+    var boxes = document.querySelectorAll('.otp-box');
+    var code = "849201";
+    boxes.forEach(function(b, i){ b.value = code[i]; b.classList.add('filled'); });
+    flowState.otpVerified = true;
+    
+    var otpGrp = document.getElementById('otp-group');
+    if(otpGrp){
+      var badge = document.getElementById('otp-status-badge');
+      if(!badge){
+        badge = document.createElement('div');
+        badge.id = 'otp-status-badge';
+        badge.style.cssText = 'margin-top:10px; padding:6px 12px; background:var(--success-bg); border:1px solid var(--success-border); border-radius:var(--radius-sm); color:var(--success-text); font-size:0.82rem; font-weight:700; display:inline-flex; align-items:center; gap:6px;';
+        otpGrp.appendChild(badge);
+      }
+      badge.innerHTML = '<span>✓</span> ' + (isHindi() ? 'मोबाइल नंबर सत्यापित (डेमो कोड: 849201)' : 'Mobile Verified via Demo OTP (849201)');
+    }
+    announceA11y(isHindi() ? 'OTP सत्यापित' : 'OTP Verified successfully');
+  }
+
+  /* Submit & Generate Official Acknowledgment Receipt */
+  async function submitReport(){
+    var declCheck = document.getElementById('declaration-check');
+    var isHi = isHindi();
+    if(declCheck && !declCheck.checked){
+      alert(isHi ? "कृपया कानूनी घोषणा चेकबॉक्स पर टिक करें।" : "Please accept the legal declaration before submitting.");
+      return;
+    }
+
+    var btn = document.getElementById('submit-btn');
+    if(btn){
+      btn.disabled = true;
+      btn.textContent = isHi ? 'सबमिट हो रहा है…' : 'Submitting & Routing…';
+    }
+
+    try {
+      var ref = 'NCRP2026' + Math.floor(100000 + Math.random()*899999);
+      var state = document.getElementById('loc-state') ? document.getElementById('loc-state').value : 'Delhi';
+      var dist = document.getElementById('loc-district') ? document.getElementById('loc-district').value : 'South Delhi';
+      var stationEl = document.getElementById('jurisdiction-station-name');
+      var station = stationEl ? stationEl.textContent : 'Cyber Crime Police Station, South District, Hauz Khas, New Delhi';
+      var descEl = document.getElementById('description');
+      var desc = descEl ? descEl.value : '';
+      var sPhone = document.getElementById('suspect-phone') ? document.getElementById('suspect-phone').value.trim() : '';
+      var sBank = document.getElementById('suspect-bank') ? document.getElementById('suspect-bank').value.trim() : '';
+      var sLink = document.getElementById('suspect-link') ? document.getElementById('suspect-link').value.trim() : '';
+      var dateEl = document.getElementById('incident-date');
+      var dateVal = (dateEl && dateEl.value) ? dateEl.value : new Date().toISOString().slice(0,10);
+      var delayEl = document.getElementById('delay-reason');
+      var delayVal = delayEl ? delayEl.value : 'prompt';
+      var nameEl = document.getElementById('full-name');
+      var nameVal = (nameEl && nameEl.value) ? nameEl.value.trim() : 'Complainant';
+      var mobEl = document.getElementById('mobile');
+      var mobVal = (mobEl && mobEl.value) ? mobEl.value.trim() : 'Verified';
+
+      var sit = (flowState && flowState.situation) ? flowState.situation : 'money';
+      var sitLabel = (situationMeta && situationMeta[sit]) ? situationMeta[sit].titleEn : 'Financial Cyber Fraud';
+
+      var complaint = {
+        ref: ref,
+        situation: sit,
+        situationLabel: sitLabel,
+        description: desc,
+        incidentDate: dateVal,
+        delayReason: delayVal,
+        locationState: state,
+        locationDistrict: dist,
+        assignedStation: station,
+        suspectPhone: sPhone,
+        suspectBank: sBank,
+        suspectLink: sLink,
+        files: (flowState && flowState.files) ? flowState.files : [],
+        anonymous: !!(flowState && flowState.anon),
+        name: (flowState && flowState.anon) ? null : nameVal,
+        mobile: (flowState && flowState.anon) ? null : mobVal,
+        status: 'received',
+        createdAt: Date.now(),
+        history: [{ status:'received', at: Date.now() }]
+      };
+
+      await new Promise(function(r){ setTimeout(r, 450); });
+      try {
+        await storageSet('complaint:' + ref, JSON.stringify(complaint), true);
+      } catch(e){
+        console.warn('Storage set complaint error:', e);
+      }
+      
+      // Register any suspect identifiers
+      try {
+        var extracted = (desc.match(/\b\d{10}\b/g) || []).concat(desc.match(/\b[\w.\-]{2,}@[a-zA-Z]{2,}\b/g) || []);
+        if(sPhone) extracted.push(sPhone);
+        if(sBank) extracted.push(sBank);
+        if(sLink) extracted.push(sLink);
+        
+        for(var i=0;i<extracted.length;i++){
+          var norm = normalizeSuspectKey(extracted[i]);
+          if(!norm) continue;
+          var key = 'suspect:' + norm;
+          var doc = await storageGet(key, true);
+          var obj = { sample: extracted[i], count: 0, refs: [] };
+          if(doc){
+            try {
+              obj = (typeof doc === 'string') ? JSON.parse(doc) : doc;
+            } catch(ex){}
+          }
+          obj.count = (obj.count || 0) + 1;
+          if(!obj.refs) obj.refs = [];
+          obj.refs.push(ref);
+          await storageSet(key, JSON.stringify(obj), true);
+        }
+      } catch(e){
+        console.warn('Telemetry index error:', e);
+      }
+
+      // Populate Printable / PDF Slip
+      var refEl = document.getElementById('ref-number');
+      if(refEl) refEl.textContent = ref;
+      var trackRefEl = document.getElementById('track-ref');
+      if(trackRefEl) trackRefEl.value = ref;
+      var slipTimeEl = document.getElementById('slip-timestamp');
+      if(slipTimeEl) slipTimeEl.textContent = new Date().toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+      var slipCatEl = document.getElementById('slip-category');
+      if(slipCatEl) slipCatEl.textContent = complaint.situationLabel;
+      var slipCompEl = document.getElementById('slip-complainant');
+      if(slipCompEl) slipCompEl.textContent = complaint.anonymous ? "Anonymous Witness (Sec 67 IT Act)" : (complaint.name + " (" + complaint.mobile + ")");
+      var slipStatEl = document.getElementById('slip-station');
+      if(slipStatEl) slipStatEl.textContent = station;
+      
+      var sArr = [];
+      if(sPhone) sArr.push('Phone: ' + sPhone);
+      if(sBank) sArr.push('UPI/Bank: ' + sBank);
+      if(sLink) sArr.push('Link: ' + sLink);
+      var slipSuspEl = document.getElementById('slip-suspect');
+      if(slipSuspEl) slipSuspEl.textContent = sArr.length ? sArr.join(' · ') : (isHi ? 'विवरण में दर्ज' : 'Extracted from narrative');
+      var slipDescEl = document.getElementById('slip-description');
+      if(slipDescEl) slipDescEl.textContent = desc.length > 120 ? desc.slice(0,120)+'…' : (desc || 'Incident logged.');
+
+      // Only display RBI dispute letter option for financial crimes (money)
+      var rbiWrap = document.getElementById('conf-rbi-wrap');
+      if(rbiWrap){
+        rbiWrap.style.display = (sit === 'money') ? 'block' : 'none';
+      }
+
+      showScreen('screen-confirmation');
+    } catch(err){
+      console.error('Error submitting report:', err);
+      alert(isHi ? 'सबमिट करने में त्रुटि: ' + err.message : 'Error submitting report: ' + err.message);
+    } finally {
+      if(btn){
+        btn.disabled = false;
+        btn.textContent = isHi ? 'शिकायत सबमिट करें और रसीद बनाएं →' : 'Submit Complaint & Generate Slip →';
+      }
+    }
+  }
+
+  function downloadSlipPdf(){
+    window.print();
+  }
+
+  /* Upgraded Tracking with 4-Stage Visual Timeline, Assigned Station, IO & CFCFRMS Lien Status */
+  async function trackComplaint(){
+    var ref = document.getElementById('track-ref').value.trim().toUpperCase();
+    var isHi = isHindi();
+    var err = document.getElementById('track-error');
+    var resBox = document.getElementById('track-result');
+    err.style.display = 'none'; resBox.style.display = 'none';
+
+    if(!ref) return;
+    var raw = await storageGet('complaint:' + ref, true);
+    if(!raw){
+      err.style.display = 'block';
+      err.textContent = isHi ? 'इस संदर्भ संख्या के साथ कोई रिपोर्ट नहीं मिली।' : 'No complaint found with that reference number.';
+      return;
+    }
+
+    var c = JSON.parse(raw);
+    var station = c.assignedStation || "Cyber Crime Police Station, South District, Hauz Khas, New Delhi";
+    var isFinancial = (c.situation === 'money');
+
+    var stages = [
+      { key: 'received', en: 'Received', hi: 'प्राप्त' },
+      { key: 'assigned', en: 'Assigned', hi: 'सौंपा गया' },
+      { key: 'investigating', en: 'Under Investigation', hi: 'जांच जारी' },
+      { key: 'resolved', en: 'Resolved', hi: 'निस्तारित' }
+    ];
+    var currIdx = statusFlow.indexOf(c.status);
+    if(currIdx === -1) currIdx = 0;
+
+    var timelineHtml = '<div style="display:flex; justify-content:space-between; margin:16px 0 20px; position:relative;">' +
+      '<div style="position:absolute; top:12px; left:12%; right:12%; height:2px; background:var(--border); z-index:0;"></div>' +
+      '<div style="position:absolute; top:12px; left:12%; width:' + (Math.max(0, currIdx) * 33.33) + '%; height:2px; background:var(--success); z-index:1; transition:width 0.3s ease;"></div>';
+    stages.forEach(function(st, idx){
+      var done = idx <= currIdx;
+      timelineHtml += '<div style="text-align:center; flex:1; position:relative; z-index:2;">' +
+        '<div style="width:26px; height:26px; border-radius:50%; margin:0 auto 4px; background:' + (done ? 'var(--success)' : 'var(--card)') + '; border:2px solid ' + (done ? 'var(--success)' : 'var(--border)') + '; color:' + (done ? '#fff' : 'var(--text-muted)') + '; font-size:0.75rem; display:flex; align-items:center; justify-content:center; font-weight:700;">' + (done ? '✓' : (idx+1)) + '</div>' +
+        '<span style="font-size:0.74rem; font-weight:' + (done ? '700' : '500') + '; color:' + (done ? 'var(--text-main)' : 'var(--text-muted)') + ';">' + (isHi ? st.hi : st.en) + '</span>' +
+        '</div>';
+    });
+    timelineHtml += '</div>';
+
+    var html = '<div style="background:var(--card-subtle); padding:18px; border-radius:var(--radius-md); border:1px solid var(--border); text-align:left;">' +
+      '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">' +
+      '<div><span style="font-size:0.75rem; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Complaint Reference</span><strong style="display:block; font-family:var(--font-mono); font-size:1.1rem; color:var(--text-main);">' + c.ref + '</strong></div>' +
+      '<span style="background:var(--success-bg); border:1px solid var(--success-border); color:var(--success-text); font-size:0.80rem; font-weight:700; padding:4px 10px; border-radius:var(--radius-full);">' + (statusLabel[c.status] ? (isHi ? statusLabel[c.status].hi : statusLabel[c.status].en) : c.status) + '</span>' +
+      '</div>' +
+
+      timelineHtml +
+
+      '<div style="background:var(--card); border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px 14px; margin-bottom:12px; font-size:0.86rem; line-height:1.45;">' +
+      '<div style="margin-bottom:6px;"><strong>Assigned Police Station:</strong> ' + station + '</div>' +
+      '<div style="margin-bottom:6px;"><strong>Investigating Officer (IO):</strong> Inspector V. R. Deshmukh (Cyber Crime Unit)</div>' +
+      (isFinancial ? '<div style="color:#1E3A8A; background:#EFF6FF; border:1px solid #BFDBFE; padding:6px 10px; border-radius:4px; margin-top:6px;"><strong>CFCFRMS Bank Lien:</strong> Active API ticket dispatched. Layer-1 Beneficiary Account hold placed.</div>' : '') +
+      '</div>' +
+
+      '<div style="font-size:0.84rem; color:var(--text-muted);">' +
+      '<p><strong>Category:</strong> ' + c.situationLabel + '</p>' +
+      '<p style="margin-top:4px;"><strong>Filed on:</strong> ' + new Date(c.createdAt).toLocaleString() + '</p>' +
+      '</div>' +
+      '</div>';
+
+    resBox.innerHTML = html;
+    resBox.style.display = 'block';
+  }
+
+  /* Suspect Check with Phone & ID Normalization */
+  async function checkSuspect(){
+    var input = document.getElementById('suspect-input').value.trim();
+    var box = document.getElementById('suspect-result-box');
+    var isHi = isHindi();
+    if(!input) return;
+
+    var key = normalizeSuspectKey(input);
+    var doc = await storageGet('suspect:' + key, true);
+    if(!doc){
+      var list = await storage.list('suspect:', true).catch(function(){ return {keys:[]}; });
+      var matchKey = (list.keys || []).find(function(k){ 
+        var bare = k.replace('suspect:',''); 
+        return bare.length >= 4 && (key.indexOf(bare) !== -1 || bare.indexOf(key) !== -1 || input.toLowerCase().indexOf(bare.replace(/^(phone_|id_)/,'')) !== -1); 
+      });
+      if(matchKey) doc = await storageGet(matchKey, true);
+    }
+
+    box.style.display = 'block';
+    if(doc){
+      var d = JSON.parse(doc);
+      box.innerHTML = '<div style="background:var(--emergency-bg); border:1px solid var(--emergency-border); border-left:4px solid var(--emergency); padding:14px; border-radius:var(--radius-sm);">' +
+        '<strong style="color:var(--emergency-text); display:block;">Flagged in ' + d.count + ' Cybercrime Report(s)</strong>' +
+        '<p style="font-size:0.86rem; color:var(--emergency-text); margin-top:2px;">This identifier has been reported in active complaints. Do not transfer funds or share OTPs.</p>' +
+        '</div>';
+    } else {
+      box.innerHTML = '<div style="background:var(--success-bg); border:1px solid var(--success-border); border-left:4px solid var(--success); padding:14px; border-radius:var(--radius-sm);">' +
+        '<strong style="color:var(--success-text); display:block;">No Prior Reports Found</strong>' +
+        '<p style="font-size:0.86rem; color:var(--success-text); margin-top:2px;">This identifier has not been flagged yet. Always exercise caution when making online payments.</p>' +
+        '</div>';
+    }
+  }
+
+  function testSuspectQuery(q){
+    document.getElementById('suspect-input').value = q;
+    checkSuspect();
+  }
+
+  /* Admin Queue */
+  async function loadAdminQueue(){
+    var body = document.getElementById('admin-table-body');
+    var isHi = isHindi();
+    body.innerHTML = '<tr><td colspan="6" style="padding:20px; text-align:center;">Loading cases…</td></tr>';
+    var list = await storage.list('complaint:', true).catch(function(){ return {keys:[]}; });
+    var keys = list.keys || [];
+    if(!keys.length){
+      body.innerHTML = '<tr><td colspan="6" style="padding:24px; text-align:center; color:var(--text-muted);">No complaints logged yet. Submit a test complaint from the citizen flow.</td></tr>';
+      return;
+    }
+
+    var complaints = [];
+    for(var i=0;i<keys.length;i++){ var raw = await storageGet(keys[i], true); if(raw) complaints.push(JSON.parse(raw)); }
+    complaints.sort(function(a,b){ return b.createdAt - a.createdAt; });
+    body.innerHTML = '';
+    complaints.forEach(function(c){
+      var tr = document.createElement('tr');
+      tr.style.borderBottom = '1px solid var(--border)';
+      var nextIdx = statusFlow.indexOf(c.status) + 1;
+      var nextStatus = statusFlow[nextIdx];
+      tr.innerHTML = '<td style="padding:10px 16px; font-family:var(--font-mono); font-weight:700;">' + c.ref + '</td><td style="padding:10px 16px;">' + c.situationLabel + '</td><td style="padding:10px 16px; max-width:240px; color:var(--text-muted);">' + (c.description ? c.description.slice(0,60)+'…' : '—') + '</td><td style="padding:10px 16px;">' + new Date(c.createdAt).toLocaleDateString() + '</td><td style="padding:10px 16px; font-weight:700; color:var(--text-main);">' + (statusLabel[c.status] ? (isHi ? statusLabel[c.status].hi : statusLabel[c.status].en) : c.status) + '</td><td style="padding:10px 16px;">' + (nextStatus ? '<button class="btn btn-secondary" style="padding:4px 8px; font-size:0.75rem;" onclick="advanceStatus(\'' + c.ref + '\')">→ ' + nextStatus + '</button>' : 'Complete') + '</td>';
+      body.appendChild(tr);
+    });
+  }
+
+  async function advanceStatus(ref){
+    var raw = await storageGet('complaint:' + ref, true);
+    if(!raw) return;
+    var c = JSON.parse(raw);
+    var nextIdx = statusFlow.indexOf(c.status) + 1;
+    if(nextIdx >= statusFlow.length) return;
+    c.status = statusFlow[nextIdx];
+    c.history.push({ status: c.status, at: Date.now() });
+    await storageSet('complaint:' + ref, JSON.stringify(c), true);
+    loadAdminQueue();
+  }
+
+  /* Diagnostic Scenarios */
+  var diagScenarios = {
+    digital_arrest: {
+      title: "Fake Police Video Call ('Digital Arrest' Scam)",
+      steps: [
+        "<strong>Hang up immediately:</strong> Indian police, CBI, Customs, and ED never arrest citizens on video calls.",
+        "<strong>Do not pay:</strong> There is no such thing as an 'RBI Security Verification Account'.",
+        "<strong>No FIR exists:</strong> Fraudsters use fake uniforms and virtual police station backdrops.",
+        "<strong>File report:</strong> Log their Skype/phone number below for telecom-level blacklisting."
+      ],
+      action: "startFlow('harass')"
+    },
+    upi_fraud: {
+      title: "Financial UPI / Telegram Task Fraud",
+      steps: [
+        "<strong>Call 1930 Helpline:</strong> If transferred recently, rapid reporting gives banks the best chance to freeze funds.",
+        "<strong>File 90-sec Report:</strong> Fast-track your complaint to your state Cyber Cell.",
+        "<strong>Generate RBI 3-Day Dispute Notice:</strong> Notify your branch for zero customer liability."
+      ],
+      action: "startFlow('money')"
+    },
+    sextortion: {
+      title: "Video / Photo Extortion Blackmail",
+      steps: [
+        "<strong>Do not transfer ransom:</strong> Extortionists will demand higher amounts.",
+        "<strong>Preserve screenshots:</strong> Save chat logs and UPI payment handles.",
+        "<strong>File Anonymous Report:</strong> Protect your privacy completely."
+      ],
+      action: "startFlow('harass')"
+    },
+    apk_bill: {
+      title: "Malicious Electricity Bill / Courier .APK",
+      steps: [
+        "<strong>Turn on Airplane Mode:</strong> Halts background SMS/OTP interception immediately.",
+        "<strong>Uninstall unknown app:</strong> Remove the recently installed APK file from Settings.",
+        "<strong>Notify Bank:</strong> Request temporary block on netbanking from another secure device."
+      ],
+      action: "startFlow('hack')"
+    }
+  };
+
+  function showDiagResult(type){
+    var card = document.getElementById('diag-result-card');
+    var content = document.getElementById('diag-result-content');
+    var sc = diagScenarios[type];
+    if(!sc) return;
+
+    var html = '<h3 style="font-size:1.2rem; margin-bottom:8px;">' + sc.title + '</h3>' +
+      '<p style="color:var(--text-muted); font-size:0.9rem;">Immediate Containment & Safety Steps:</p>' +
+      '<ol class="diag-steps-ol">';
+    sc.steps.forEach(function(s){ html += '<li>' + s + '</li>'; });
+    html += '</ol>' +
+      '<div style="display:flex; gap:10px; margin-top:16px; flex-wrap:wrap;">' +
+      '<button class="btn btn-primary" onclick="' + sc.action + '">Proceed to Fast-Track Report</button>' +
+      (type === 'upi_fraud' ? '<button class="btn btn-secondary" onclick="showScreen(\'screen-rbi\')">Generate RBI Dispute Notice</button>' : '') +
+      '</div>';
+    content.innerHTML = html;
+    card.classList.add('show');
+    card.scrollIntoView({behavior:'smooth', block:'center'});
+  }
+
+  /* RBI Letter Generator */
+  function updateRbiLetter(){
+    var name = document.getElementById('rbi-name').value || '[Account Holder Name]';
+    var bank = document.getElementById('rbi-bank').value || '[Bank Name]';
+    var amount = document.getElementById('rbi-amount').value || '[Disputed Amount]';
+    var account = document.getElementById('rbi-account').value || '[Account / UPI ID]';
+    var utr = document.getElementById('rbi-utr').value || '[Transaction ID / UTR]';
+    var ncrp = document.getElementById('rbi-ncrp').value || '[NCRP Ref Number]';
+    var today = new Date().toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' });
+
+    var letter = "To:\nThe Branch Manager / Nodal Grievance Officer\n" + bank + "\n\n" +
+      "Date: " + today + "\n\n" +
+      "SUBJECT: FORMAL DISPUTE OF UNAUTHORIZED ELECTRONIC TRANSACTION (RBI CIRCULAR DBR.No.Leg.BC.78/09.07.005/2017-18)\n\n" +
+      "Dear Sir/Madam,\n\n" +
+      "I am writing to formally place on record an unauthorized electronic transaction of " + amount + " debited from my " + account + " on " + today + " without my consent.\n\n" +
+      "1. DETAILS OF TRANSACTION:\n" +
+      "   • Account Holder: " + name + "\n" +
+      "   • Disputed Amount: " + amount + "\n" +
+      "   • Transaction UTR / Ref: " + utr + "\n" +
+      "   • Cyber Crime Reference (NCRP): " + ncrp + "\n\n" +
+      "2. ZERO CUSTOMER LIABILITY (RBI MANDATE):\n" +
+      "   In accordance with RBI Circular RBI/2017-18/15 (Section 6(a)), zero liability applies to the customer as this notification is submitted within 3 working days.\n\n" +
+      "3. MANDATORY SHADOW CREDIT:\n" +
+      "   Under Section 9 of the circular, the bank is statutorily mandated to credit the disputed amount of " + amount + " to my account within 10 working days, pending investigation.\n\n" +
+      "Yours sincerely,\n\n" +
+      name + "\n" +
+      "Attached: NCRP Portal Acknowledgment (" + ncrp + ") & Transaction Statement";
+
+    document.getElementById('rbi-letter-output').textContent = letter;
+  }
+
+  function autoFillRbiSample(){
+    document.getElementById('rbi-name').value = "Vikram Aditya Malhotra";
+    document.getElementById('rbi-bank').value = "State Bank of India";
+    document.getElementById('rbi-amount').value = "₹ 78,500";
+    document.getElementById('rbi-account').value = "A/C: XXXXXXXXXX3819 / UPI: vikram@sbi";
+    document.getElementById('rbi-utr').value = "UPI/428194018291/IMPS";
+    document.getElementById('rbi-ncrp').value = "NCRP2026" + Math.floor(100000 + Math.random()*899999);
+    updateRbiLetter();
+  }
+
+  function copyRbiLetter(){
+    var text = document.getElementById('rbi-letter-output').textContent;
+    navigator.clipboard.writeText(text).then(function(){
+      alert(isHindi() ? "विवाद पत्र क्लिपबोर्ड पर कॉपी किया गया!" : "Formal RBI Dispute Letter copied to clipboard!");
+    });
+  }
+
+  function openRbiWithRef(){
+    var ref = document.getElementById('ref-number').textContent;
+    if(ref && ref !== 'NCRP2026000000') document.getElementById('rbi-ncrp').value = ref;
+    updateRbiLetter();
+    showScreen('screen-rbi');
+  }
+
+  /* Quick Demo & Form Fillers */
+  function quickDemoFraud(){
+    startFlow('money');
+    quickFillForm('upi');
+    goToStep(2);
+  }
+
+  function quickFillForm(type){
+    var desc = document.getElementById('description');
+    var date = document.getElementById('incident-date');
+    var sPhone = document.getElementById('suspect-phone');
+    var sBank = document.getElementById('suspect-bank');
+    var sLink = document.getElementById('suspect-link');
+    var delay = document.getElementById('delay-reason');
+    date.value = new Date().toISOString().split('T')[0];
+
+    // Reset suspect input values
+    if(sPhone) sPhone.value = '';
+    if(sBank) sBank.value = '';
+    if(sLink) sLink.value = '';
+
+    if(type === 'upi'){
+      flowState.situation = 'money';
+      document.getElementById('situation-select').value = 'money';
+      desc.value = "Received call from +91 9876543210 claiming to be bank customer care. Asked to scan a QR code on PhonePe for cashback refund. ₹45,000 debited in 2 transactions to UPI ID: refund.support@okhdfcbank (UTR: 428194018291).";
+      if(sPhone) sPhone.value = '+91 9876543210';
+      if(sBank) sBank.value = 'refund.support@okhdfcbank';
+      if(delay) delay.value = 'prompt';
+      toggleSuspectField('phone', true);
+      toggleSuspectField('bank', true);
+    } else if(type === 'digital_arrest'){
+      flowState.situation = 'harass';
+      document.getElementById('situation-select').value = 'harass';
+      desc.value = "Received WhatsApp video call from +91 9811223344 with caller wearing police uniform against police station background. Claimed a DHL parcel with contraband was seized in my name. Threatened non-bailable CBI arrest and extorted ₹1,50,000 as clearing bond.";
+      if(sPhone) sPhone.value = '+91 9811223344';
+      if(sBank) sBank.value = 'A/C 501002341928 / HDFC0000120';
+      if(delay) delay.value = 'threat_duress';
+      toggleSuspectField('phone', true);
+      toggleSuspectField('bank', true);
+    } else if(type === 'telegram_job'){
+      flowState.situation = 'money';
+      document.getElementById('situation-select').value = 'money';
+      desc.value = "Joined Telegram group @daily_reviews_earn promising ₹3,000/day for rating places on Google Maps. Initially paid ₹500, then coerced into investing ₹85,000 in prepaid VIP rating tasks on https://gold-task-vip.com. Withdrawal balance frozen.";
+      if(sBank) sBank.value = 'task.payout@icici';
+      if(sLink) sLink.value = 'https://gold-task-vip.com (@daily_reviews_earn)';
+      if(delay) delay.value = 'discovered_late';
+      toggleSuspectField('bank', true);
+      toggleSuspectField('link', true);
+    } else if(type === 'stock_trading'){
+      flowState.situation = 'money';
+      document.getElementById('situation-select').value = 'money';
+      desc.value = "Added to WhatsApp group 'Institutional Equity VIP'. Downloaded APK 'ApexTradePro.apk' from fake link. Transferred ₹2,10,000 via IMPS for institutional IPO allocation. App shows fake ₹9L profit but demands 30% tax to release funds.";
+      if(sPhone) sPhone.value = '+91 9123456780';
+      if(sLink) sLink.value = 'https://apex-trade-pro.apk/download';
+      if(sBank) sBank.value = 'A/C 918273619283 / YESB0000123';
+      if(delay) delay.value = 'discovered_late';
+      toggleSuspectField('phone', true);
+      toggleSuspectField('bank', true);
+      toggleSuspectField('link', true);
+    } else if(type === 'electricity'){
+      flowState.situation = 'money';
+      document.getElementById('situation-select').value = 'money';
+      desc.value = "Received SMS from VM-POWERR: 'Dear consumer, your electricity will be disconnected at 9:30 PM tonight due to unpaid bill. Call officer +91 9988776655 immediately.' Scammer made me install QuickSupport app and drained ₹32,000 from SBI account.";
+      if(sPhone) sPhone.value = '+91 9988776655';
+      if(sLink) sLink.value = 'QuickSupport Screen Share APK / SMS header: VM-POWERR';
+      if(delay) delay.value = 'prompt';
+      toggleSuspectField('phone', true);
+      toggleSuspectField('link', true);
+    } else if(type === 'hack'){
+      flowState.situation = 'hack';
+      document.getElementById('situation-select').value = 'hack';
+      desc.value = "Lost access to WhatsApp account after clicking a malicious voting link sent by a friend. Hacker enabled 2-Step PIN, locked me out, and is broadcasting urgent UPI money requests to family contacts.";
+      if(sLink) sLink.value = 'https://vote-talent-hunt-2026.online';
+      if(delay) delay.value = 'prompt';
+      toggleSuspectField('link', true);
+    } else if(type === 'sextortion'){
+      flowState.situation = 'harass';
+      document.getElementById('situation-select').value = 'harass';
+      desc.value = "Received an unsolicited Instagram video call from @priya_verma_99. Caller recorded screen and morphed explicit footage with my face. Now extorting ₹50,000 on WhatsApp +91 9771122334, threatening to leak video to my family and Instagram followers.";
+      if(sPhone) sPhone.value = '+91 9771122334';
+      if(sLink) sLink.value = 'Instagram: @priya_verma_99';
+      if(delay) delay.value = 'threat_duress';
+      toggleSuspectField('phone', true);
+      toggleSuspectField('link', true);
+    }
+    applySituation(flowState.situation);
+    updateCharCount();
+  }
+
+  /* Pre-seed Demo Suspects */
+  (async function seedData(){
+    await storageSet('suspect:' + normalizeSuspectKey('+91 9876543210'), JSON.stringify({ sample:'+91 9876543210', count: 18 }), true);
+    await storageSet('suspect:' + normalizeSuspectKey('sbi-reward-points.apk'), JSON.stringify({ sample:'sbi-reward-points.apk', count: 42 }), true);
+    await storageSet('suspect:' + normalizeSuspectKey('+91 9771122334'), JSON.stringify({ sample:'+91 9771122334', count: 9 }), true);
+  })();
+
+  updateRbiLetter();
+  initLocationSelectors();
+
+  /* Learning Corner Interactive Logic */
+  function filterLearningCorner(cat, btn){
+    document.querySelectorAll('.lc-filter-btn').forEach(function(b){ b.classList.remove('active'); });
+    if(btn) btn.classList.add('active');
+    var cards = document.querySelectorAll('#lc-guides-grid .lc-card');
+    cards.forEach(function(c){
+      if(cat === 'all' || c.getAttribute('data-cat') === cat){
+        c.style.display = 'flex';
+      } else {
+        c.style.display = 'none';
+      }
+    });
+  }
+
+  function updateAuditScore(){
+    var checks = [
+      document.getElementById('aud-1'),
+      document.getElementById('aud-2'),
+      document.getElementById('aud-3'),
+      document.getElementById('aud-4'),
+      document.getElementById('aud-5')
+    ];
+    var score = 0;
+    checks.forEach(function(ch){ if(ch && ch.checked) score += 20; });
+    var disp = document.getElementById('audit-score-display');
+    if(!disp) return;
+
+    if(score === 100){
+      disp.textContent = "Score: 100/100 · Optimal";
+      disp.style.color = "var(--success-text)";
+      disp.style.borderColor = "var(--success-border)";
+      disp.style.background = "var(--success-bg)";
+    } else if(score >= 60){
+      disp.textContent = "Score: " + score + "/100 · Moderate";
+      disp.style.color = "var(--warning-text)";
+      disp.style.borderColor = "var(--warning-border)";
+      disp.style.background = "var(--warning-bg)";
+    } else {
+      disp.textContent = "Score: " + score + "/100 · At High Risk";
+      disp.style.color = "var(--emergency-text)";
+      disp.style.borderColor = "var(--emergency-border)";
+      disp.style.background = "var(--emergency-bg)";
+    }
+  }
+
+  /* Accessibility & Voice */
+  function announceA11y(msg){
+    var el = document.getElementById('a11y-announcer');
+    if(el){ el.textContent = ''; setTimeout(function(){ el.textContent = msg; }, 50); }
+  }
+
+  var pageSummaries = {
+    'screen-home': "CyberSuraksha homepage. Select what happened to file a report or check scam diagnostics.",
+    'screen-diagnostic': "Check a Scam tool. Choose your scenario for immediate safety steps.",
+    'screen-learning': "Safety Tips — interactive cyber hygiene audits and scam defense guides.",
+    'screen-rbi': "RBI 3-Day Zero-Liability dispute notice generator for bank refund recovery.",
+    'screen-flow': "Report submission wizard. Enter incident details and contact info.",
+    'screen-confirmation': "Report confirmation screen with your reference number.",
+    'screen-track': "Complaint tracking page. Enter reference number to view progress.",
+    'screen-suspect': "Suspect verification scanner. Search phone numbers, UPI IDs, or links."
+  };
+
+  function toggleSpeak(){
+    if(!('speechSynthesis' in window)){ alert("Browser does not support text-to-speech."); return; }
+    if(window.speechSynthesis.speaking){ stopSpeaking(); return; }
+    var active = document.querySelector('.screen.active');
+    var id = active ? active.id : 'screen-home';
+    var text = pageSummaries[id] || "CyberSuraksha portal.";
+    var utter = new SpeechSynthesisUtterance(text);
+    utter.onend = function(){ document.getElementById('speak-btn').classList.remove('speaking'); };
+    window.speechSynthesis.speak(utter);
+    document.getElementById('speak-btn').classList.add('speaking');
+  }
+
+  function stopSpeaking(){
+    if(window.speechSynthesis) window.speechSynthesis.cancel();
+    document.getElementById('speak-btn').classList.remove('speaking');
+  }
+
+  window.addEventListener('keydown', function(e){
+    if(e.key === 'Escape') stopSpeaking();
+  });
+
+  /* Slim Minimalist Tiranga Progress Synchronizer */
+  (function initTirangaProgress(){
+    var fill = document.getElementById('tiranga-progress-fill');
+    if(!fill) return;
+
+    function updateProgress(){
+      var scrollTop = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+      var docHeight = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight, document.documentElement.clientHeight);
+      var winHeight = window.innerHeight;
+      var maxScroll = docHeight - winHeight;
+      if(maxScroll <= 5){
+        fill.style.height = '0%';
+        return;
+      }
+      var pct = Math.min(Math.max(scrollTop / maxScroll, 0), 1);
+      fill.style.height = (pct * 100) + '%';
+    }
+
+    window.addEventListener('scroll', updateProgress, { passive: true });
+    window.addEventListener('resize', updateProgress, { passive: true });
+    window.addEventListener('load', updateProgress);
+    document.addEventListener('DOMContentLoaded', updateProgress);
+    setTimeout(updateProgress, 200);
+
+    // Hook into showScreen to recalculate on view change
+    var origShowScreen = window.showScreen;
+    if(origShowScreen){
+      window.showScreen = function(id){
+        origShowScreen(id);
+        setTimeout(updateProgress, 60);
+      };
+    }
+  })();
+</script>
+</body>
+</html>
